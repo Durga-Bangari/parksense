@@ -42,6 +42,36 @@ The codebase will follow a clean layered structure as the project grows:
 - `util`
 - `exception`
 
+## Core API shape
+
+The recommendation API will be built around this request structure:
+
+```json
+{
+  "latitude": 47.6,
+  "longitude": -122.3,
+  "arrivalTime": "2026-04-12T18:00:00"
+}
+```
+
+And will return ranked parking recommendations like:
+
+```json
+{
+  "recommendations": [
+    {
+      "spotId": "P1",
+      "spotName": "Central Garage",
+      "distanceMeters": 200.0,
+      "predictedAvailability": 0.75,
+      "predictedPrice": 12.5,
+      "score": 8.7,
+      "explanation": "High availability and low price near your destination"
+    }
+  ]
+}
+```
+
 ## Getting started
 
 ### Prerequisites
