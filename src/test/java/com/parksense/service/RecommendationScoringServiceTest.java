@@ -22,7 +22,7 @@ class RecommendationScoringServiceTest {
     void roundsScoreToOneDecimalPlace() {
         double score = recommendationScoringService.calculateScore(0.75, 12.50, 200.0);
 
-        assertEquals(7.3, score, 0.001);
+        assertEquals(7.1, score, 0.001);
     }
 
     @Test

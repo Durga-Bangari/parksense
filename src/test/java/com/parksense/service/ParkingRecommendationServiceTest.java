@@ -54,7 +54,7 @@ class ParkingRecommendationServiceTest {
         );
 
         ParkingRecommendation firstRecommendation =
-                parkingRecommendationService.getRecommendations(request).recommendations().getFirst();
+                parkingRecommendationService.getRecommendations(request).recommendations().get(0);
 
         assertTrue(firstRecommendation.distanceMeters() > 0.0);
         assertTrue(firstRecommendation.predictedAvailability() >= 0.0);

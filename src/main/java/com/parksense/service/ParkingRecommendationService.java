@@ -87,7 +87,7 @@ public class ParkingRecommendationService {
             return "No parking recommendations available for the selected destination and arrival time";
         }
 
-        ParkingRecommendation bestRecommendation = recommendations.getFirst();
+        ParkingRecommendation bestRecommendation = recommendations.get(0);
         return bestRecommendation.spotName() + " is the top recommendation based on availability, price, and distance";
     }
 }

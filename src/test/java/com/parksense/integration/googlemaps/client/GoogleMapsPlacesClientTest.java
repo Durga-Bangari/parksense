@@ -20,7 +20,7 @@ class GoogleMapsPlacesClientTest {
         GoogleMapsNearbySearchRequest request =
                 client.createNearbySearchRequest(new Location(47.6097, -122.3331));
 
-        assertEquals("parking", request.includedTypes().getFirst());
+        assertEquals("parking", request.includedTypes().get(0));
         assertEquals(1800, request.locationRestriction().circle().radius(), 0.001);
         assertEquals("DISTANCE", request.rankPreference());
     }
