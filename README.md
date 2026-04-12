@@ -115,6 +115,40 @@ Example response:
 }
 ```
 
+### Recommendation endpoint
+
+```bash
+POST /api/v1/recommendations
+```
+
+Example request:
+
+```json
+{
+  "latitude": 47.6,
+  "longitude": -122.3,
+  "arrivalTime": "2026-04-12T18:00:00"
+}
+```
+
+Example response:
+
+```json
+{
+  "recommendations": [
+    {
+      "spotId": "P1",
+      "spotName": "Central Garage",
+      "distanceMeters": 200.0,
+      "predictedAvailability": 0.75,
+      "predictedPrice": 12.5,
+      "score": 8.7,
+      "explanation": "High availability and low price near your destination"
+    }
+  ]
+}
+```
+
 ## Recruiter-friendly positioning
 
 This project is intentionally built in stages. The current version focuses on production-style backend design, modular prediction-oriented architecture, and clean extension points for future ML and LLM integrations.
