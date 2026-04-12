@@ -1,6 +1,9 @@
 .idea/
 .vscode/
 target/
+.idea/
+frontend/node_modules/
+frontend/dist/
 .m2/
 .mvn-home/
 .mvn/wrapper/maven-wrapper.jar
