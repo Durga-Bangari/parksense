@@ -49,6 +49,7 @@ Current Phase 3 foundation:
 - Spring Data JPA support for persistence
 - `SearchHistory` entity for storing recommendation lookup metadata
 - JPA repository support for recent-search retrieval
+- recent search history API support for future app history screens
 
 Current Phase 2 foundation:
 
@@ -262,6 +263,27 @@ Example response:
   "fallbackToMockOnFailure": true,
   "searchRadiusMeters": 1500
 }
+```
+
+### Recent search history endpoint
+
+```bash
+GET /api/v1/search-history
+```
+
+Example response:
+
+```json
+[
+  {
+    "id": 1,
+    "latitude": 47.6,
+    "longitude": -122.3,
+    "arrivalTime": "2026-04-12T18:00:00",
+    "searchedAt": "2026-04-12T17:45:00",
+    "bestOptionSummary": "Central Garage is the top recommendation based on availability, price, and distance"
+  }
+]
 ```
 
 ### Recommendation endpoint

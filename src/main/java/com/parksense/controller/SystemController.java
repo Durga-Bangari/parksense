@@ -2,7 +2,9 @@ package com.parksense.controller;
 
 import com.parksense.config.ParkingProviderProperties;
 import com.parksense.model.ProviderDiagnosticsResponse;
+import com.parksense.model.SearchHistoryItem;
 import com.parksense.provider.ParkingDataProvider;
+import com.parksense.service.SearchHistoryService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,13 +17,16 @@ public class SystemController {
 
     private final ParkingDataProvider parkingDataProvider;
     private final ParkingProviderProperties parkingProviderProperties;
+    private final SearchHistoryService searchHistoryService;
 
     public SystemController(
             ParkingDataProvider parkingDataProvider,
-            ParkingProviderProperties parkingProviderProperties
+            ParkingProviderProperties parkingProviderProperties,
+            SearchHistoryService searchHistoryService
     ) {
         this.parkingDataProvider = parkingDataProvider;
         this.parkingProviderProperties = parkingProviderProperties;
+        this.searchHistoryService = searchHistoryService;
     }
 
     @GetMapping("/health")
@@ -44,6 +49,11 @@ public class SystemController {
                 parkingProviderProperties.isFallbackToMockOnFailure(),
                 parkingProviderProperties.getSearchRadiusMeters()
         );
+    }
+
+    @GetMapping("/search-history")
+    public java.util.List<SearchHistoryItem> recentSearchHistory() {
+        return searchHistoryService.getRecentSearches();
     }
 
     private boolean isProviderReady() {

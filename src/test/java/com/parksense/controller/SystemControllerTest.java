@@ -1,12 +1,17 @@
 package com.parksense.controller;
 
 import com.parksense.config.ParkingProviderProperties;
+import com.parksense.model.SearchHistoryItem;
 import com.parksense.provider.ParkingDataProvider;
+import com.parksense.service.SearchHistoryService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -24,6 +29,9 @@ class SystemControllerTest {
 
     @MockBean
     private ParkingProviderProperties parkingProviderProperties;
+
+    @MockBean
+    private SearchHistoryService searchHistoryService;
 
     @Test
     void healthEndpointReturnsApplicationStatus() throws Exception {
@@ -63,5 +71,27 @@ class SystemControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.providerReady").value(false))
                 .andExpect(jsonPath("$.statusMessage").value("Provider configuration is incomplete"));
+    }
+
+    @Test
+    void searchHistoryEndpointReturnsRecentSearches() throws Exception {
+        given(searchHistoryService.getRecentSearches()).willReturn(List.of(
+                new SearchHistoryItem(
+                        1L,
+                        47.6,
+                        -122.3,
+                        LocalDateTime.of(2026, 4, 12, 18, 0),
+                        LocalDateTime.of(2026, 4, 12, 17, 45),
+                        "Central Garage is the top recommendation based on availability, price, and distance"
+                )
+        ));
+
+        mockMvc.perform(get("/api/v1/search-history"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value(1))
+                .andExpect(jsonPath("$[0].latitude").value(47.6))
+                .andExpect(jsonPath("$[0].longitude").value(-122.3))
+                .andExpect(jsonPath("$[0].bestOptionSummary")
+                        .value("Central Garage is the top recommendation based on availability, price, and distance"));
     }
 }
