@@ -32,6 +32,7 @@ Drivers often spend extra time searching for parking, pay more than expected, or
 - Availability prediction service with time-based heuristics
 - Price prediction service with demand-based logic
 - Weighted recommendation scoring service
+- Rule-based recommendation explanation service
 
 ## Planned backend flow
 
