@@ -25,7 +25,7 @@ Drivers often spend extra time searching for parking, pay more than expected, or
 ## Phase 1 features
 
 - Spring Boot REST API with layered backend structure
-- Mock parking data repository for local development
+- Mock parking data provider for local development
 - Time-based parking availability prediction
 - Demand-based parking price estimation
 - Weighted recommendation scoring using availability, price, and distance
@@ -46,7 +46,7 @@ Current Phase 2 foundation:
 ## Planned backend flow
 
 1. Accept destination coordinates and arrival time
-2. Fetch nearby parking spots from a mock repository
+2. Fetch nearby parking spots from a mock provider
 3. Predict availability using time-based heuristics
 4. Predict price using demand-based logic
 5. Rank parking spots using a weighted recommendation score
@@ -59,7 +59,7 @@ The codebase will follow a clean layered structure as the project grows:
 - `controller`
 - `service`
 - `model`
-- `repository`
+- `provider`
 - `util`
 - `exception`
 

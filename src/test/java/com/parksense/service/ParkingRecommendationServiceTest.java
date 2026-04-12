@@ -3,8 +3,8 @@ package com.parksense.service;
 import com.parksense.model.ParkingRecommendation;
 import com.parksense.model.ParkingRecommendationRequest;
 import com.parksense.model.ParkingRecommendationResponse;
+import com.parksense.provider.MockParkingDataProvider;
 import com.parksense.provider.ParkingDataProvider;
-import com.parksense.repository.ParkingSpotRepository;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ParkingRecommendationServiceTest {
 
-    private final ParkingDataProvider parkingDataProvider = new ParkingSpotRepository();
+    private final ParkingDataProvider parkingDataProvider = new MockParkingDataProvider();
 
     private final ParkingRecommendationService parkingRecommendationService =
             new ParkingRecommendationService(

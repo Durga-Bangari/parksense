@@ -1,14 +1,13 @@
-package com.parksense.repository;
+package com.parksense.provider;
 
 import com.parksense.model.Location;
 import com.parksense.model.ParkingSpot;
-import com.parksense.provider.ParkingDataProvider;
-import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-@Repository
-public class ParkingSpotRepository implements ParkingDataProvider {
+@Component
+public class MockParkingDataProvider implements ParkingDataProvider {
 
     private static final List<ParkingSpot> PARKING_SPOTS = List.of(
             new ParkingSpot("P1", "Central Garage", new Location(47.6097, -122.3331), 14.00),
