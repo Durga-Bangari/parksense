@@ -1,6 +1,8 @@
 package com.parksense.integration.googlemaps.client;
 
 import com.parksense.config.ParkingProviderProperties;
+import com.parksense.exception.ExternalProviderException;
+import com.parksense.exception.ProviderConfigurationException;
 import com.parksense.integration.googlemaps.dto.GoogleMapsCircle;
 import com.parksense.integration.googlemaps.dto.GoogleMapsLatLng;
 import com.parksense.integration.googlemaps.dto.GoogleMapsLocationRestriction;
@@ -11,6 +13,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientException;
 
 import java.util.List;
 
@@ -36,13 +39,22 @@ public class GoogleMapsPlacesClient {
         validateApiKey();
 
         GoogleMapsNearbySearchRequest request = createNearbySearchRequest(destination);
-        GoogleMapsNearbySearchResponse response = restClient.post()
-                .uri(NEARBY_SEARCH_PATH)
-                .header("X-Goog-Api-Key", properties.getGoogleMapsApiKey())
-                .header("X-Goog-FieldMask", FIELD_MASK)
-                .body(request)
-                .retrieve()
-                .body(GoogleMapsNearbySearchResponse.class);
+        GoogleMapsNearbySearchResponse response;
+        try {
+            response = restClient.post()
+                    .uri(NEARBY_SEARCH_PATH)
+                    .header("X-Goog-Api-Key", properties.getGoogleMapsApiKey())
+                    .header("X-Goog-FieldMask", FIELD_MASK)
+                    .body(request)
+                    .retrieve()
+                    .body(GoogleMapsNearbySearchResponse.class);
+        } catch (RestClientException exception) {
+            throw new ExternalProviderException(
+                    "google-maps",
+                    "Google Maps nearby search request failed",
+                    exception
+            );
+        }
 
         return response != null ? response : new GoogleMapsNearbySearchResponse(List.of());
     }
@@ -63,7 +75,10 @@ public class GoogleMapsPlacesClient {
 
     private void validateApiKey() {
         if (properties.getGoogleMapsApiKey() == null || properties.getGoogleMapsApiKey().isBlank()) {
-            throw new IllegalStateException("Google Maps API key is required when provider type is google-maps");
+            throw new ProviderConfigurationException(
+                    "google-maps",
+                    "Google Maps API key is required when provider type is google-maps"
+            );
         }
     }
 }

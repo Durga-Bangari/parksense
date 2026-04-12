@@ -18,13 +18,41 @@ public class GlobalExceptionHandler {
                 .map(fieldError -> fieldError.getDefaultMessage())
                 .toList();
 
-        ErrorResponse errorResponse = new ErrorResponse(
-                LocalDateTime.now(),
-                HttpStatus.BAD_REQUEST.value(),
-                "Validation failed",
-                details
-        );
+        ErrorResponse errorResponse = buildErrorResponse(HttpStatus.BAD_REQUEST, "Validation failed", details);
 
         return ResponseEntity.badRequest().body(errorResponse);
+    }
+
+    @ExceptionHandler(ProviderConfigurationException.class)
+    public ResponseEntity<ErrorResponse> handleProviderConfigurationException(
+            ProviderConfigurationException exception
+    ) {
+        ErrorResponse errorResponse = buildErrorResponse(
+                HttpStatus.SERVICE_UNAVAILABLE,
+                "Parking data provider is not configured",
+                List.of(exception.getMessage())
+        );
+
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(errorResponse);
+    }
+
+    @ExceptionHandler(ExternalProviderException.class)
+    public ResponseEntity<ErrorResponse> handleExternalProviderException(ExternalProviderException exception) {
+        ErrorResponse errorResponse = buildErrorResponse(
+                HttpStatus.BAD_GATEWAY,
+                "Parking data provider request failed",
+                List.of(exception.getMessage())
+        );
+
+        return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(errorResponse);
+    }
+
+    private ErrorResponse buildErrorResponse(HttpStatus status, String error, List<String> details) {
+        return new ErrorResponse(
+                LocalDateTime.now(),
+                status.value(),
+                error,
+                details
+        );
     }
 }

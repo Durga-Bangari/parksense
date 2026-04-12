@@ -1,5 +1,6 @@
 package com.parksense.controller;
 
+import com.parksense.exception.ExternalProviderException;
 import com.parksense.model.ParkingRecommendation;
 import com.parksense.model.ParkingRecommendationResponse;
 import com.parksense.service.ParkingRecommendationService;
@@ -70,6 +71,25 @@ class ParkingRecommendationControllerTest {
                 .andExpect(jsonPath("$.recommendations[0].longitude").value(-122.3331))
                 .andExpect(jsonPath("$.recommendations[0].providerType").value("mock"))
                 .andExpect(jsonPath("$.recommendations[0].score").value(8.7));
+    }
+
+    @Test
+    void returnsBadGatewayWhenProviderRequestFails() throws Exception {
+        given(parkingRecommendationService.getRecommendations(any()))
+                .willThrow(new ExternalProviderException("google-maps", "Google Maps nearby search request failed"));
+
+        mockMvc.perform(post("/api/v1/recommendations")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "latitude": 47.6,
+                                  "longitude": -122.3,
+                                  "arrivalTime": "2026-04-12T18:00:00"
+                                }
+                                """))
+                .andExpect(status().isBadGateway())
+                .andExpect(jsonPath("$.error").value("Parking data provider request failed"))
+                .andExpect(jsonPath("$.details[0]").value("Google Maps nearby search request failed"));
     }
 
     @Test

@@ -1,6 +1,7 @@
 package com.parksense.provider;
 
 import com.parksense.config.ParkingProviderProperties;
+import com.parksense.exception.ExternalProviderException;
 import com.parksense.integration.googlemaps.client.GoogleMapsPlacesClient;
 import com.parksense.integration.googlemaps.dto.GoogleMapsDisplayName;
 import com.parksense.integration.googlemaps.dto.GoogleMapsLatLng;
@@ -84,7 +85,7 @@ class GoogleMapsParkingDataProviderTest {
                 .willThrow(new IllegalStateException("provider unavailable"));
 
         assertThrows(
-                IllegalStateException.class,
+                ExternalProviderException.class,
                 () -> googleMapsParkingDataProvider.findNearbySpots(destination)
         );
     }

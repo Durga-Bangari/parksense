@@ -1,6 +1,7 @@
 package com.parksense.integration.googlemaps.client;
 
 import com.parksense.config.ParkingProviderProperties;
+import com.parksense.exception.ProviderConfigurationException;
 import com.parksense.integration.googlemaps.dto.GoogleMapsNearbySearchRequest;
 import com.parksense.model.Location;
 import org.junit.jupiter.api.Test;
@@ -31,7 +32,7 @@ class GoogleMapsPlacesClientTest {
         GoogleMapsPlacesClient client = new GoogleMapsPlacesClient(RestClient.builder(), properties);
 
         assertThrows(
-                IllegalStateException.class,
+                ProviderConfigurationException.class,
                 () -> client.searchNearbyParking(new Location(47.6097, -122.3331))
         );
     }

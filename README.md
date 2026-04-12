@@ -82,6 +82,7 @@ The Google provider now also:
 
 - filters incomplete external place records before mapping
 - falls back to mock parking data when enabled and the external call fails or returns nothing usable
+- translates provider configuration and request failures into clean API error responses
 
 ## Frontend-ready response fields
 
@@ -245,6 +246,14 @@ Example response:
 ### Validation example
 
 If invalid coordinates are provided, the API returns a `400 Bad Request` response with validation details.
+
+### Provider error behavior
+
+When the Google Maps provider is active:
+
+- missing provider configuration returns `503 Service Unavailable`
+- upstream provider request failures return `502 Bad Gateway`
+- optional fallback can still serve mock recommendations when enabled
 
 ## Recruiter-friendly positioning
 

@@ -1,6 +1,8 @@
 package com.parksense.provider;
 
 import com.parksense.config.ParkingProviderProperties;
+import com.parksense.exception.ExternalProviderException;
+import com.parksense.exception.ProviderConfigurationException;
 import com.parksense.integration.googlemaps.client.GoogleMapsPlacesClient;
 import com.parksense.integration.googlemaps.dto.GoogleMapsPlace;
 import com.parksense.integration.googlemaps.dto.GoogleMapsNearbySearchResponse;
@@ -48,9 +50,17 @@ public class GoogleMapsParkingDataProvider implements ParkingDataProvider {
             if (!mappedSpots.isEmpty()) {
                 return mappedSpots;
             }
-        } catch (RuntimeException exception) {
+        } catch (ProviderConfigurationException | ExternalProviderException exception) {
             if (!properties.isFallbackToMockOnFailure()) {
                 throw exception;
+            }
+        } catch (RuntimeException exception) {
+            if (!properties.isFallbackToMockOnFailure()) {
+                throw new ExternalProviderException(
+                        getProviderType(),
+                        "Google Maps provider failed while fetching nearby parking data",
+                        exception
+                );
             }
         }
 
