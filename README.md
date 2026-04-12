@@ -22,6 +22,13 @@ Drivers often spend extra time searching for parking, pay more than expected, or
 - No real ML model yet
 - No LLM integration yet
 
+## Current progress
+
+- Spring Boot project bootstrap
+- Health check endpoint
+- Core recommendation models
+- Mock parking spot repository with seed data
+
 ## Planned backend flow
 
 1. Accept destination coordinates and arrival time
