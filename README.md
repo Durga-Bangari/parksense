@@ -33,9 +33,9 @@ Drivers often spend extra time searching for parking, pay more than expected, or
 - Top recommendation summary in the API response
 - Request validation and centralized error handling
 
-## Phase 2 direction
+## Phase 2 outcome
 
-Phase 2 starts by separating the recommendation engine from the mock data source. This makes the backend easier to extend into a real website or mobile app because external providers such as Google Maps can later plug into the same internal recommendation flow.
+Phase 2 moves ParkSense from a mock-only backend toward a real-data-ready service. The recommendation pipeline can still run locally with mock data, but it now has the provider abstractions, external client layer, fallback behavior, diagnostics, and caching needed for future website or mobile app integration.
 
 Current Phase 2 foundation:
 
@@ -55,12 +55,28 @@ parksense.provider.google-maps-api-key=
 parksense.provider.search-radius-meters=1500
 ```
 
-For now, the active provider remains `mock`. Later, we can switch this configuration when a real provider such as Google Maps is added.
+For local development, the active provider should stay `mock`. When you want to test the real provider path, switch the type to `google-maps` and supply a valid API key.
 
 Supported provider types today:
 
 - `mock`
-- `google-maps` placeholder
+- `google-maps`
+
+## Running modes
+
+### Mock mode
+
+- fastest way to run the project locally
+- deterministic recommendation flow for demos and development
+- no external credentials required
+
+### Google Maps mode
+
+- uses the Google Places Nearby Search path to fetch parking candidates
+- maps external place data into the internal `ParkingSpot` model
+- supports fallback-to-mock behavior and short-lived caching
+
+An example configuration is available in [application-googlemaps.example.properties](C:/GitProjects/Projects/smart-parking-finder/src/main/resources/application-googlemaps.example.properties:1).
 
 ## Google Maps integration path
 
@@ -86,6 +102,17 @@ The Google provider now also:
 - falls back to mock parking data when enabled and the external call fails or returns nothing usable
 - translates provider configuration and request failures into clean API error responses
 - caches successful nearby search results for a short configurable TTL
+
+## App-ready backend notes
+
+This backend is now structured so a future React, Next.js, Android, iOS, or Flutter client can consume one stable REST contract while the provider implementation evolves behind the scenes.
+
+Useful frontend-facing pieces already in place:
+
+- frontend-ready recommendation fields such as coordinates, address, category, and provider type
+- stable request and response models for recommendation lookups
+- diagnostics endpoint for checking provider readiness in development or staging
+- centralized validation and error handling for predictable client behavior
 
 ## Frontend-ready response fields
 
@@ -172,6 +199,13 @@ The application starts on `http://localhost:8080`.
 mvn test
 ```
 
+### Switch to Google Maps mode
+
+1. Copy the settings from `src/main/resources/application-googlemaps.example.properties`
+2. Put your real Google Maps API key into `parksense.provider.google-maps-api-key`
+3. Set `parksense.provider.type=google-maps`
+4. Start the app and check `GET /api/v1/provider`
+
 ### First endpoint
 
 ```bash
@@ -210,6 +244,14 @@ Example response:
 
 ```bash
 POST /api/v1/recommendations
+```
+
+Example `curl` request:
+
+```bash
+curl -X POST http://localhost:8080/api/v1/recommendations \
+  -H "Content-Type: application/json" \
+  -d "{\"latitude\":47.6,\"longitude\":-122.3,\"arrivalTime\":\"2026-04-12T18:00:00\"}"
 ```
 
 Example request:
