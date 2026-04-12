@@ -5,10 +5,13 @@ import com.parksense.model.ParkingRecommendation;
 import com.parksense.model.ParkingRecommendationRequest;
 import com.parksense.model.ParkingRecommendationResponse;
 import com.parksense.model.ParkingSpot;
+import com.parksense.model.SearchHistory;
 import com.parksense.provider.ParkingDataProvider;
+import com.parksense.repository.SearchHistoryRepository;
 import com.parksense.util.DistanceCalculator;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 
@@ -20,19 +23,22 @@ public class ParkingRecommendationService {
     private final PricePredictionService pricePredictionService;
     private final RecommendationScoringService recommendationScoringService;
     private final RecommendationExplanationService recommendationExplanationService;
+    private final SearchHistoryRepository searchHistoryRepository;
 
     public ParkingRecommendationService(
             ParkingDataProvider parkingDataProvider,
             AvailabilityPredictionService availabilityPredictionService,
             PricePredictionService pricePredictionService,
             RecommendationScoringService recommendationScoringService,
-            RecommendationExplanationService recommendationExplanationService
+            RecommendationExplanationService recommendationExplanationService,
+            SearchHistoryRepository searchHistoryRepository
     ) {
         this.parkingDataProvider = parkingDataProvider;
         this.availabilityPredictionService = availabilityPredictionService;
         this.pricePredictionService = pricePredictionService;
         this.recommendationScoringService = recommendationScoringService;
         this.recommendationExplanationService = recommendationExplanationService;
+        this.searchHistoryRepository = searchHistoryRepository;
     }
 
     public ParkingRecommendationResponse getRecommendations(ParkingRecommendationRequest request) {
@@ -44,8 +50,21 @@ public class ParkingRecommendationService {
                 .toList();
 
         String bestOptionSummary = buildBestOptionSummary(recommendations);
+        saveSearchHistory(request, bestOptionSummary);
 
         return new ParkingRecommendationResponse(bestOptionSummary, recommendations);
+    }
+
+    private void saveSearchHistory(ParkingRecommendationRequest request, String bestOptionSummary) {
+        SearchHistory searchHistory = new SearchHistory(
+                request.latitude(),
+                request.longitude(),
+                request.arrivalTime(),
+                LocalDateTime.now(),
+                bestOptionSummary
+        );
+
+        searchHistoryRepository.save(searchHistory);
     }
 
     private ParkingRecommendation buildRecommendation(

@@ -6,6 +6,7 @@ import com.parksense.model.ParkingRecommendationResponse;
 import com.parksense.provider.MockParkingDataProvider;
 import com.parksense.provider.ParkingDataProvider;
 import org.junit.jupiter.api.Test;
+import com.parksense.repository.SearchHistoryRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -13,10 +14,15 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 class ParkingRecommendationServiceTest {
 
     private final ParkingDataProvider parkingDataProvider = new MockParkingDataProvider();
+    private final SearchHistoryRepository searchHistoryRepository = mock(SearchHistoryRepository.class);
 
     private final ParkingRecommendationService parkingRecommendationService =
             new ParkingRecommendationService(
@@ -24,7 +30,8 @@ class ParkingRecommendationServiceTest {
                     new AvailabilityPredictionService(),
                     new PricePredictionService(),
                     new RecommendationScoringService(),
-                    new RecommendationExplanationService()
+                    new RecommendationExplanationService(),
+                    searchHistoryRepository
             );
 
     @Test
@@ -46,6 +53,7 @@ class ParkingRecommendationServiceTest {
         assertFalse(recommendations.get(0).category().isBlank());
         assertEquals("mock", recommendations.get(0).providerType());
         assertTrue(recommendations.get(0).score() >= recommendations.get(1).score());
+        verify(searchHistoryRepository, times(1)).save(any());
     }
 
     @Test
