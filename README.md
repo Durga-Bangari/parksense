@@ -57,6 +57,21 @@ mvn spring-boot:run
 
 The application starts on `http://localhost:8080`.
 
+### First endpoint
+
+```bash
+GET /api/v1/health
+```
+
+Example response:
+
+```json
+{
+  "status": "UP",
+  "application": "ParkSense"
+}
+```
+
 ## Recruiter-friendly positioning
 
 This project is intentionally built in stages. The current version focuses on production-style backend design, modular prediction-oriented architecture, and clean extension points for future ML and LLM integrations.
