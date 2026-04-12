@@ -3,6 +3,7 @@ package com.parksense.controller;
 import com.parksense.model.ParkingRecommendationRequest;
 import com.parksense.model.ParkingRecommendationResponse;
 import com.parksense.service.ParkingRecommendationService;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,7 +20,7 @@ public class ParkingRecommendationController {
     }
 
     @PostMapping
-    public ParkingRecommendationResponse getRecommendations(@RequestBody ParkingRecommendationRequest request) {
+    public ParkingRecommendationResponse getRecommendations(@Valid @RequestBody ParkingRecommendationRequest request) {
         return parkingRecommendationService.getRecommendations(request);
     }
 }

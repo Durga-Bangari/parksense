@@ -34,6 +34,7 @@ Drivers often spend extra time searching for parking, pay more than expected, or
 - Weighted recommendation scoring service
 - Rule-based recommendation explanation service
 - Main recommendation service that assembles ranked parking results
+- Request validation and centralized API error handling
 
 ## Planned backend flow
 
