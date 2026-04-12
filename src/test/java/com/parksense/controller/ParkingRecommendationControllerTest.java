@@ -32,6 +32,9 @@ class ParkingRecommendationControllerTest {
         ParkingRecommendation recommendation = new ParkingRecommendation(
                 "P1",
                 "Central Garage",
+                47.6097,
+                -122.3331,
+                "mock",
                 200.0,
                 0.75,
                 12.50,
@@ -59,6 +62,9 @@ class ParkingRecommendationControllerTest {
                         .value("Central Garage is the top recommendation based on availability, price, and distance"))
                 .andExpect(jsonPath("$.recommendations[0].spotId").value("P1"))
                 .andExpect(jsonPath("$.recommendations[0].spotName").value("Central Garage"))
+                .andExpect(jsonPath("$.recommendations[0].latitude").value(47.6097))
+                .andExpect(jsonPath("$.recommendations[0].longitude").value(-122.3331))
+                .andExpect(jsonPath("$.recommendations[0].providerType").value("mock"))
                 .andExpect(jsonPath("$.recommendations[0].score").value(8.7));
     }
 

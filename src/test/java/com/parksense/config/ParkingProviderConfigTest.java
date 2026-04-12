@@ -21,7 +21,7 @@ class ParkingProviderConfigTest {
                 parkingProviderConfig.parkingDataProvider(
                         properties,
                         new MockParkingDataProvider(),
-                        new GoogleMapsParkingDataProvider(null)
+                        new GoogleMapsParkingDataProvider(null, new MockParkingDataProvider(), properties)
                 );
 
         assertInstanceOf(MockParkingDataProvider.class, provider);
@@ -36,7 +36,7 @@ class ParkingProviderConfigTest {
                 parkingProviderConfig.parkingDataProvider(
                         properties,
                         new MockParkingDataProvider(),
-                        new GoogleMapsParkingDataProvider(null)
+                        new GoogleMapsParkingDataProvider(null, new MockParkingDataProvider(), properties)
                 );
 
         assertInstanceOf(GoogleMapsParkingDataProvider.class, provider);
@@ -52,7 +52,7 @@ class ParkingProviderConfigTest {
                 () -> parkingProviderConfig.parkingDataProvider(
                         properties,
                         new MockParkingDataProvider(),
-                        new GoogleMapsParkingDataProvider(null)
+                        new GoogleMapsParkingDataProvider(null, new MockParkingDataProvider(), properties)
                 )
         );
     }

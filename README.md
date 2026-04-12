@@ -73,9 +73,22 @@ parksense.provider.type=mock
 parksense.provider.google-maps-base-url=https://places.googleapis.com/v1
 parksense.provider.google-maps-api-key=
 parksense.provider.search-radius-meters=1500
+parksense.provider.fallback-to-mock-on-failure=true
 ```
 
 When `parksense.provider.type=google-maps`, the backend is prepared to call the Google Places Nearby Search endpoint and map parking-related places into the recommendation pipeline.
+
+The Google provider now also:
+
+- filters incomplete external place records before mapping
+- falls back to mock parking data when enabled and the external call fails or returns nothing usable
+
+## Frontend-ready response fields
+
+Recommendation responses now include:
+
+- spot coordinates for map rendering
+- `providerType` so web or mobile clients can display or debug the data source
 
 ## Planned backend flow
 
@@ -118,6 +131,9 @@ It returns a top recommendation summary plus ranked parking options:
     {
       "spotId": "P1",
       "spotName": "Central Garage",
+      "latitude": 47.6097,
+      "longitude": -122.3331,
+      "providerType": "mock",
       "distanceMeters": 200.0,
       "predictedAvailability": 0.75,
       "predictedPrice": 12.5,
@@ -189,6 +205,9 @@ Example response:
     {
       "spotId": "P1",
       "spotName": "Central Garage",
+      "latitude": 47.6097,
+      "longitude": -122.3331,
+      "providerType": "mock",
       "distanceMeters": 200.0,
       "predictedAvailability": 0.75,
       "predictedPrice": 12.5,

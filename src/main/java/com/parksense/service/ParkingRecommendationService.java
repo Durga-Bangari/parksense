@@ -70,6 +70,9 @@ public class ParkingRecommendationService {
         return new ParkingRecommendation(
                 parkingSpot.id(),
                 parkingSpot.name(),
+                parkingSpot.location().latitude(),
+                parkingSpot.location().longitude(),
+                parkingDataProvider.getProviderType(),
                 roundToOneDecimal(distanceMeters),
                 predictedAvailability,
                 predictedPrice,

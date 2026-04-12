@@ -9,6 +9,7 @@ public class ParkingProviderProperties {
     private String googleMapsBaseUrl = "https://places.googleapis.com/v1";
     private String googleMapsApiKey = "";
     private int searchRadiusMeters = 1500;
+    private boolean fallbackToMockOnFailure = true;
 
     public String getType() {
         return type;
@@ -40,5 +41,13 @@ public class ParkingProviderProperties {
 
     public void setSearchRadiusMeters(int searchRadiusMeters) {
         this.searchRadiusMeters = searchRadiusMeters;
+    }
+
+    public boolean isFallbackToMockOnFailure() {
+        return fallbackToMockOnFailure;
+    }
+
+    public void setFallbackToMockOnFailure(boolean fallbackToMockOnFailure) {
+        this.fallbackToMockOnFailure = fallbackToMockOnFailure;
     }
 }
