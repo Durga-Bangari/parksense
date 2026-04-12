@@ -30,6 +30,7 @@ Drivers often spend extra time searching for parking, pay more than expected, or
 - Mock parking spot repository with seed data
 - Distance calculation utility for location-aware ranking
 - Availability prediction service with time-based heuristics
+- Price prediction service with demand-based logic
 
 ## Planned backend flow
 
