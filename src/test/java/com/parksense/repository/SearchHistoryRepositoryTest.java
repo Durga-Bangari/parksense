@@ -4,6 +4,8 @@ import com.parksense.model.SearchHistory;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -53,7 +55,9 @@ class SearchHistoryRepositoryTest {
                 "Newer recommendation summary"
         ));
 
-        List<SearchHistory> recentSearches = searchHistoryRepository.findTop10ByOrderBySearchedAtDesc();
+        List<SearchHistory> recentSearches = searchHistoryRepository.findAll(
+                PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "searchedAt"))
+        ).getContent();
 
         assertEquals(2, recentSearches.size());
         assertEquals("Newer recommendation summary", recentSearches.get(0).getBestOptionSummary());

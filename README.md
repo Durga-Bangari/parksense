@@ -271,6 +271,10 @@ Example response:
 GET /api/v1/search-history
 ```
 
+Optional query parameter:
+
+- `limit` to control how many recent searches are returned, capped at `50`
+
 Example response:
 
 ```json

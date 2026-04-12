@@ -75,7 +75,7 @@ class SystemControllerTest {
 
     @Test
     void searchHistoryEndpointReturnsRecentSearches() throws Exception {
-        given(searchHistoryService.getRecentSearches()).willReturn(List.of(
+        given(searchHistoryService.getRecentSearches(5)).willReturn(List.of(
                 new SearchHistoryItem(
                         1L,
                         47.6,
@@ -86,7 +86,7 @@ class SystemControllerTest {
                 )
         ));
 
-        mockMvc.perform(get("/api/v1/search-history"))
+        mockMvc.perform(get("/api/v1/search-history").param("limit", "5"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").value(1))
                 .andExpect(jsonPath("$[0].latitude").value(47.6))

@@ -6,6 +6,7 @@ import com.parksense.model.SearchHistoryItem;
 import com.parksense.provider.ParkingDataProvider;
 import com.parksense.service.SearchHistoryService;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -52,8 +53,10 @@ public class SystemController {
     }
 
     @GetMapping("/search-history")
-    public java.util.List<SearchHistoryItem> recentSearchHistory() {
-        return searchHistoryService.getRecentSearches();
+    public java.util.List<SearchHistoryItem> recentSearchHistory(
+            @RequestParam(defaultValue = "10") int limit
+    ) {
+        return searchHistoryService.getRecentSearches(limit);
     }
 
     private boolean isProviderReady() {
