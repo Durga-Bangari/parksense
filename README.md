@@ -180,6 +180,25 @@ Example response:
 }
 ```
 
+### Provider diagnostics endpoint
+
+```bash
+GET /api/v1/provider
+```
+
+Example response:
+
+```json
+{
+  "configuredProviderType": "mock",
+  "activeProviderType": "mock",
+  "providerReady": true,
+  "statusMessage": "Provider configuration is ready",
+  "fallbackToMockOnFailure": true,
+  "searchRadiusMeters": 1500
+}
+```
+
 ### Recommendation endpoint
 
 ```bash
