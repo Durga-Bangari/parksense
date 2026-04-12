@@ -7,6 +7,7 @@ public record GoogleMapsPlace(
         String id,
         GoogleMapsDisplayName displayName,
         GoogleMapsLatLng location,
+        String formattedAddress,
         String primaryType
 ) {
 }

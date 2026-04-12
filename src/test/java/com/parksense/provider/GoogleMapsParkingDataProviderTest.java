@@ -32,6 +32,7 @@ class GoogleMapsParkingDataProviderTest {
                 "gm-1",
                 new GoogleMapsDisplayName("Downtown Parking", "en"),
                 new GoogleMapsLatLng(47.6100, -122.3340),
+                "123 Pine St, Seattle, WA",
                 "parking"
         );
         given(googleMapsPlacesClient.searchNearbyParking(destination))
@@ -42,6 +43,8 @@ class GoogleMapsParkingDataProviderTest {
         assertEquals(1, spots.size());
         assertEquals("gm-1", spots.get(0).id());
         assertEquals("Downtown Parking", spots.get(0).name());
+        assertEquals("123 Pine St, Seattle, WA", spots.get(0).address());
+        assertEquals("parking", spots.get(0).category());
     }
 
     @Test
@@ -61,6 +64,7 @@ class GoogleMapsParkingDataProviderTest {
         GoogleMapsPlace incompletePlace = new GoogleMapsPlace(
                 "",
                 new GoogleMapsDisplayName("Unnamed", "en"),
+                null,
                 null,
                 "parking"
         );

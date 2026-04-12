@@ -66,6 +66,8 @@ public class GoogleMapsParkingDataProvider implements ParkingDataProvider {
                 place.id(),
                 spotName,
                 new Location(place.location().latitude(), place.location().longitude()),
+                place.formattedAddress(),
+                place.primaryType(),
                 DEFAULT_BASE_PRICE_PER_HOUR
         );
     }

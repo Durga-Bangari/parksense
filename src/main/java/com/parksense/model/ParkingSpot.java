@@ -4,6 +4,8 @@ public record ParkingSpot(
         String id,
         String name,
         Location location,
+        String address,
+        String category,
         double basePricePerHour
 ) {
 }

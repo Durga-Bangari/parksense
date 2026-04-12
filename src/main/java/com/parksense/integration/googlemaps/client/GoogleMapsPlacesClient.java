@@ -19,7 +19,7 @@ public class GoogleMapsPlacesClient {
 
     private static final String NEARBY_SEARCH_PATH = "/places:searchNearby";
     private static final String FIELD_MASK =
-            "places.id,places.displayName,places.location,places.primaryType";
+            "places.id,places.displayName,places.location,places.formattedAddress,places.primaryType";
 
     private final RestClient restClient;
     private final ParkingProviderProperties properties;

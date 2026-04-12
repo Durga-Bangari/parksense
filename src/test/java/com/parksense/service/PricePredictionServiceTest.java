@@ -16,6 +16,8 @@ class PricePredictionServiceTest {
             "P1",
             "Central Garage",
             new Location(47.6097, -122.3331),
+            "1200 4th Ave, Seattle, WA",
+            "garage",
             12.00
     );
 
