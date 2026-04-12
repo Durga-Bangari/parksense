@@ -8,9 +8,14 @@ import com.parksense.integration.googlemaps.dto.GoogleMapsPlace;
 import com.parksense.integration.googlemaps.dto.GoogleMapsNearbySearchResponse;
 import com.parksense.model.Location;
 import com.parksense.model.ParkingSpot;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.time.Clock;
+import java.time.Instant;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 public class GoogleMapsParkingDataProvider implements ParkingDataProvider {
@@ -20,15 +25,29 @@ public class GoogleMapsParkingDataProvider implements ParkingDataProvider {
     private final GoogleMapsPlacesClient googleMapsPlacesClient;
     private final MockParkingDataProvider mockParkingDataProvider;
     private final ParkingProviderProperties properties;
+    private final Clock clock;
+    private final Map<String, CacheEntry> cachedSpotsByDestination;
 
+    @Autowired
     public GoogleMapsParkingDataProvider(
             GoogleMapsPlacesClient googleMapsPlacesClient,
             MockParkingDataProvider mockParkingDataProvider,
             ParkingProviderProperties properties
     ) {
+        this(googleMapsPlacesClient, mockParkingDataProvider, properties, Clock.systemUTC());
+    }
+
+    GoogleMapsParkingDataProvider(
+            GoogleMapsPlacesClient googleMapsPlacesClient,
+            MockParkingDataProvider mockParkingDataProvider,
+            ParkingProviderProperties properties,
+            Clock clock
+    ) {
         this.googleMapsPlacesClient = googleMapsPlacesClient;
         this.mockParkingDataProvider = mockParkingDataProvider;
         this.properties = properties;
+        this.clock = clock;
+        this.cachedSpotsByDestination = new ConcurrentHashMap<>();
     }
 
     @Override
@@ -38,6 +57,11 @@ public class GoogleMapsParkingDataProvider implements ParkingDataProvider {
 
     @Override
     public List<ParkingSpot> findNearbySpots(Location destination) {
+        List<ParkingSpot> cachedSpots = getCachedSpots(destination);
+        if (cachedSpots != null) {
+            return cachedSpots;
+        }
+
         try {
             GoogleMapsNearbySearchResponse response = googleMapsPlacesClient.searchNearbyParking(destination);
             List<ParkingSpot> mappedSpots = response.places() == null
@@ -48,6 +72,7 @@ public class GoogleMapsParkingDataProvider implements ParkingDataProvider {
                     .toList();
 
             if (!mappedSpots.isEmpty()) {
+                cacheSpots(destination, mappedSpots);
                 return mappedSpots;
             }
         } catch (ProviderConfigurationException | ExternalProviderException exception) {
@@ -65,6 +90,39 @@ public class GoogleMapsParkingDataProvider implements ParkingDataProvider {
         }
 
         return mockParkingDataProvider.findNearbySpots(destination);
+    }
+
+    private List<ParkingSpot> getCachedSpots(Location destination) {
+        if (!properties.isCacheEnabled()) {
+            return null;
+        }
+
+        String cacheKey = buildCacheKey(destination);
+        CacheEntry cacheEntry = cachedSpotsByDestination.get(cacheKey);
+
+        if (cacheEntry == null) {
+            return null;
+        }
+
+        if (cacheEntry.expiresAt().isAfter(clock.instant())) {
+            return cacheEntry.spots();
+        }
+
+        cachedSpotsByDestination.remove(cacheKey);
+        return null;
+    }
+
+    private void cacheSpots(Location destination, List<ParkingSpot> spots) {
+        if (!properties.isCacheEnabled()) {
+            return;
+        }
+
+        Instant expiresAt = clock.instant().plusSeconds(Math.max(1, properties.getCacheTtlSeconds()));
+        cachedSpotsByDestination.put(buildCacheKey(destination), new CacheEntry(List.copyOf(spots), expiresAt));
+    }
+
+    private String buildCacheKey(Location destination) {
+        return "%.5f:%.5f".formatted(destination.latitude(), destination.longitude());
     }
 
     private ParkingSpot toParkingSpot(GoogleMapsPlace place) {
@@ -89,5 +147,8 @@ public class GoogleMapsParkingDataProvider implements ParkingDataProvider {
                 && place.location() != null
                 && Double.isFinite(place.location().latitude())
                 && Double.isFinite(place.location().longitude());
+    }
+
+    private record CacheEntry(List<ParkingSpot> spots, Instant expiresAt) {
     }
 }

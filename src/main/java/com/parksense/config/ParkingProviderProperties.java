@@ -10,6 +10,8 @@ public class ParkingProviderProperties {
     private String googleMapsApiKey = "";
     private int searchRadiusMeters = 1500;
     private boolean fallbackToMockOnFailure = true;
+    private boolean cacheEnabled = true;
+    private int cacheTtlSeconds = 300;
 
     public String getType() {
         return type;
@@ -49,5 +51,21 @@ public class ParkingProviderProperties {
 
     public void setFallbackToMockOnFailure(boolean fallbackToMockOnFailure) {
         this.fallbackToMockOnFailure = fallbackToMockOnFailure;
+    }
+
+    public boolean isCacheEnabled() {
+        return cacheEnabled;
+    }
+
+    public void setCacheEnabled(boolean cacheEnabled) {
+        this.cacheEnabled = cacheEnabled;
+    }
+
+    public int getCacheTtlSeconds() {
+        return cacheTtlSeconds;
+    }
+
+    public void setCacheTtlSeconds(int cacheTtlSeconds) {
+        this.cacheTtlSeconds = cacheTtlSeconds;
     }
 }

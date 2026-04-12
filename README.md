@@ -74,6 +74,8 @@ parksense.provider.google-maps-base-url=https://places.googleapis.com/v1
 parksense.provider.google-maps-api-key=
 parksense.provider.search-radius-meters=1500
 parksense.provider.fallback-to-mock-on-failure=true
+parksense.provider.cache-enabled=true
+parksense.provider.cache-ttl-seconds=300
 ```
 
 When `parksense.provider.type=google-maps`, the backend is prepared to call the Google Places Nearby Search endpoint and map parking-related places into the recommendation pipeline.
@@ -83,6 +85,7 @@ The Google provider now also:
 - filters incomplete external place records before mapping
 - falls back to mock parking data when enabled and the external call fails or returns nothing usable
 - translates provider configuration and request failures into clean API error responses
+- caches successful nearby search results for a short configurable TTL
 
 ## Frontend-ready response fields
 
