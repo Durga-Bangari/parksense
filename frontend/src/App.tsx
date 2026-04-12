@@ -1,4 +1,4 @@
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 
 type Recommendation = {
   spotId: string;
@@ -18,6 +18,15 @@ type Recommendation = {
 type RecommendationResponse = {
   bestOptionSummary: string;
   recommendations: Recommendation[];
+};
+
+type SearchHistoryItem = {
+  id: number;
+  latitude: number;
+  longitude: number;
+  arrivalTime: string;
+  searchedAt: string;
+  bestOptionSummary: string;
 };
 
 type SearchForm = {
@@ -44,8 +53,38 @@ const initialFormState: SearchForm = {
 function App() {
   const [form, setForm] = useState<SearchForm>(initialFormState);
   const [result, setResult] = useState<RecommendationResponse | null>(null);
+  const [historyItems, setHistoryItems] = useState<SearchHistoryItem[]>([]);
   const [errorMessage, setErrorMessage] = useState<string>("");
+  const [historyErrorMessage, setHistoryErrorMessage] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isHistoryLoading, setIsHistoryLoading] = useState<boolean>(true);
+
+  async function loadRecentSearches() {
+    setIsHistoryLoading(true);
+    setHistoryErrorMessage("");
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/search-history?limit=5`);
+
+      if (!response.ok) {
+        throw new Error("Unable to load recent searches.");
+      }
+
+      const searchHistory = (await response.json()) as SearchHistoryItem[];
+      setHistoryItems(searchHistory);
+    } catch {
+      setHistoryErrorMessage(
+        "Recent searches are unavailable right now. Start the backend to view history."
+      );
+      setHistoryItems([]);
+    } finally {
+      setIsHistoryLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    void loadRecentSearches();
+  }, []);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -82,6 +121,7 @@ function App() {
       const recommendationResponse =
         (await response.json()) as RecommendationResponse;
       setResult(recommendationResponse);
+      await loadRecentSearches();
     } catch {
       setErrorMessage(
         "ParkSense could not reach the backend. Make sure the Spring Boot API is running on localhost:8080."
@@ -235,6 +275,73 @@ function App() {
             <p>
               Submit a search to see ranked parking recommendations from the
               Spring Boot backend.
+            </p>
+          </div>
+        )}
+      </section>
+
+      <section className="history-panel">
+        <div className="results-header">
+          <div>
+            <span className="card-label">Recent Activity</span>
+            <h2>Latest parking searches</h2>
+          </div>
+          <button
+            className="secondary-link refresh-button"
+            type="button"
+            onClick={() => {
+              void loadRecentSearches();
+            }}
+            disabled={isHistoryLoading}
+          >
+            {isHistoryLoading ? "Refreshing..." : "Refresh History"}
+          </button>
+        </div>
+
+        {historyErrorMessage ? (
+          <p className="status-error history-status">{historyErrorMessage}</p>
+        ) : null}
+
+        {historyItems.length > 0 ? (
+          <div className="history-grid">
+            {historyItems.map((historyItem) => (
+              <article className="history-card" key={historyItem.id}>
+                <div className="history-topline">
+                  <span className="result-provider">Search #{historyItem.id}</span>
+                  <span className="history-time">
+                    {new Date(historyItem.searchedAt).toLocaleString()}
+                  </span>
+                </div>
+
+                <p className="history-summary">{historyItem.bestOptionSummary}</p>
+
+                <dl className="metric-grid">
+                  <div>
+                    <dt>Latitude</dt>
+                    <dd>{historyItem.latitude.toFixed(4)}</dd>
+                  </div>
+                  <div>
+                    <dt>Longitude</dt>
+                    <dd>{historyItem.longitude.toFixed(4)}</dd>
+                  </div>
+                  <div>
+                    <dt>Arrival</dt>
+                    <dd>{new Date(historyItem.arrivalTime).toLocaleString()}</dd>
+                  </div>
+                  <div>
+                    <dt>Searched At</dt>
+                    <dd>{new Date(historyItem.searchedAt).toLocaleTimeString()}</dd>
+                  </div>
+                </dl>
+              </article>
+            ))}
+          </div>
+        ) : (
+          <div className="empty-state">
+            <p>
+              {isHistoryLoading
+                ? "Loading recent parking searches from the backend..."
+                : "Your recent recommendation lookups will appear here after you search."}
             </p>
           </div>
         )}
