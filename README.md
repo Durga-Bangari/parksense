@@ -2,6 +2,12 @@
 
 ParkSense is an AI-ready backend system for parking recommendation. In this first version, the project uses rule-based heuristics and mock data to predict parking availability, estimate price, and rank nearby parking spots for a given destination and arrival time.
 
+## Project snapshot
+
+- Phase 1: heuristic recommendation engine with mock parking data
+- Phase 2: real-data-ready provider architecture with Google Maps integration scaffolding
+- Phase 3: persistence support for search history and app-oriented backend workflows
+
 ## Why this project
 
 Drivers often spend extra time searching for parking, pay more than expected, or end up parking farther away than they want. ParkSense is designed to address that problem with a backend architecture that can grow from deterministic heuristics into a future ML-powered recommendation engine.
@@ -51,6 +57,12 @@ Current Phase 3 foundation:
 - JPA repository support for recent-search retrieval
 - recent search history API support for future app history screens
 
+Why this matters for a future app:
+
+- recommendation requests now create backend state instead of being one-off computations
+- a web or mobile client can show recent searches without recomputing past requests
+- the persistence layer is now structured so H2 can later be swapped for PostgreSQL
+
 Current Phase 2 foundation:
 
 - `ParkingDataProvider` abstraction for parking data sources
@@ -58,6 +70,15 @@ Current Phase 2 foundation:
 - recommendation service now depends on a provider contract instead of concrete mock storage
 - typed provider configuration for future external API integration
 - provider selection config with a Google Maps integration placeholder
+
+## Persistence flow
+
+1. A client sends `POST /api/v1/recommendations`
+2. ParkSense builds ranked parking recommendations
+3. The best-option summary and request metadata are stored in `search_history`
+4. A client can later call `GET /api/v1/search-history` to render recent activity
+
+This keeps the first persistence slice simple while still adding meaningful app behavior.
 
 ## Provider configuration
 
@@ -224,6 +245,12 @@ Use these defaults:
 - username: `sa`
 - password: leave blank
 
+### Migrate to PostgreSQL later
+
+The persistence layer is intentionally built with Spring Data JPA so moving from H2 to PostgreSQL is mostly a configuration change plus a production driver dependency.
+
+An example production-style config is available in [application-postgresql.example.properties](C:/GitProjects/Projects/smart-parking-finder/src/main/resources/application-postgresql.example.properties:1).
+
 ### Switch to Google Maps mode
 
 1. Copy the settings from `src/main/resources/application-googlemaps.example.properties`
@@ -274,6 +301,12 @@ GET /api/v1/search-history
 Optional query parameter:
 
 - `limit` to control how many recent searches are returned, capped at `50`
+
+Example request:
+
+```bash
+GET /api/v1/search-history?limit=5
+```
 
 Example response:
 
@@ -353,3 +386,5 @@ When the Google Maps provider is active:
 ## Recruiter-friendly positioning
 
 This project is intentionally built in stages. The current version focuses on production-style backend design, modular prediction-oriented architecture, and clean extension points for future ML and LLM integrations.
+
+Phase 3 makes the project feel more like a real backend product by adding persistence, request history, and an API shape that a future frontend can build on without changing the recommendation core.
