@@ -87,6 +87,7 @@ The Google provider now also:
 
 Recommendation responses now include:
 
+- address and category for display-friendly parking cards
 - spot coordinates for map rendering
 - `providerType` so web or mobile clients can display or debug the data source
 
@@ -131,6 +132,8 @@ It returns a top recommendation summary plus ranked parking options:
     {
       "spotId": "P1",
       "spotName": "Central Garage",
+      "address": "1200 4th Ave, Seattle, WA",
+      "category": "garage",
       "latitude": 47.6097,
       "longitude": -122.3331,
       "providerType": "mock",
@@ -224,6 +227,8 @@ Example response:
     {
       "spotId": "P1",
       "spotName": "Central Garage",
+      "address": "1200 4th Ave, Seattle, WA",
+      "category": "garage",
       "latitude": 47.6097,
       "longitude": -122.3331,
       "providerType": "mock",

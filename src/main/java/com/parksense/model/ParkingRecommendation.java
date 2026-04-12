@@ -3,6 +3,8 @@ package com.parksense.model;
 public record ParkingRecommendation(
         String spotId,
         String spotName,
+        String address,
+        String category,
         double latitude,
         double longitude,
         String providerType,

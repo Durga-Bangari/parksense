@@ -42,6 +42,8 @@ class ParkingRecommendationServiceTest {
         assertEquals(5, recommendations.size());
         assertFalse(recommendations.isEmpty());
         assertFalse(response.bestOptionSummary().isBlank());
+        assertFalse(recommendations.get(0).address().isBlank());
+        assertFalse(recommendations.get(0).category().isBlank());
         assertEquals("mock", recommendations.get(0).providerType());
         assertTrue(recommendations.get(0).score() >= recommendations.get(1).score());
     }
@@ -57,6 +59,8 @@ class ParkingRecommendationServiceTest {
         ParkingRecommendation firstRecommendation =
                 parkingRecommendationService.getRecommendations(request).recommendations().get(0);
 
+        assertFalse(firstRecommendation.address().isBlank());
+        assertFalse(firstRecommendation.category().isBlank());
         assertEquals(47.6097, firstRecommendation.latitude(), 0.1);
         assertEquals(-122.3331, firstRecommendation.longitude(), 0.1);
         assertTrue(firstRecommendation.distanceMeters() > 0.0);
