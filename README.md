@@ -43,6 +43,13 @@ Phase 2 moves ParkSense from a mock-only backend toward a real-data-ready servic
 
 Phase 3 adds persistence and app-backend foundations. We are starting with Spring Data JPA and an in-memory H2 database so ParkSense can begin storing backend state while staying simple to run locally.
 
+Current Phase 3 foundation:
+
+- H2 database configuration for local development
+- Spring Data JPA support for persistence
+- `SearchHistory` entity for storing recommendation lookup metadata
+- JPA repository support for recent-search retrieval
+
 Current Phase 2 foundation:
 
 - `ParkingDataProvider` abstraction for parking data sources
@@ -144,6 +151,7 @@ The codebase will follow a clean layered structure as the project grows:
 - `controller`
 - `service`
 - `model`
+- `repository`
 - `provider`
 - `util`
 - `exception`
