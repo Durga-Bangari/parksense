@@ -28,6 +28,7 @@ Drivers often spend extra time searching for parking, pay more than expected, or
 - Health check endpoint
 - Core recommendation models
 - Mock parking spot repository with seed data
+- Distance calculation utility for location-aware ranking
 
 ## Planned backend flow
 
