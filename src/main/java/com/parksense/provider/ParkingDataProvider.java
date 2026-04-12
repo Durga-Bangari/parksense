@@ -7,5 +7,7 @@ import java.util.List;
 
 public interface ParkingDataProvider {
 
+    String getProviderType();
+
     List<ParkingSpot> findNearbySpots(Location destination);
 }

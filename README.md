@@ -43,6 +43,7 @@ Current Phase 2 foundation:
 - mock provider remains the active implementation for local development
 - recommendation service now depends on a provider contract instead of concrete mock storage
 - typed provider configuration for future external API integration
+- provider selection config with a Google Maps integration placeholder
 
 ## Provider configuration
 
@@ -55,6 +56,11 @@ parksense.provider.search-radius-meters=1500
 ```
 
 For now, the active provider remains `mock`. Later, we can switch this configuration when a real provider such as Google Maps is added.
+
+Supported provider types today:
+
+- `mock`
+- `google-maps` placeholder
 
 ## Planned backend flow
 

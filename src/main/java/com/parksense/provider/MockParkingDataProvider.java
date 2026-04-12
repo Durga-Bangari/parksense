@@ -18,6 +18,11 @@ public class MockParkingDataProvider implements ParkingDataProvider {
     );
 
     @Override
+    public String getProviderType() {
+        return "mock";
+    }
+
+    @Override
     public List<ParkingSpot> findNearbySpots(Location destination) {
         return PARKING_SPOTS;
     }
