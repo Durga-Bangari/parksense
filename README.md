@@ -62,6 +62,21 @@ Supported provider types today:
 - `mock`
 - `google-maps` placeholder
 
+## Google Maps integration path
+
+The backend now includes a typed Google Maps Places client and DTOs for the Nearby Search API. This keeps external request and response handling separate from the internal `ParkingSpot` model.
+
+Current Google Maps configuration:
+
+```properties
+parksense.provider.type=mock
+parksense.provider.google-maps-base-url=https://places.googleapis.com/v1
+parksense.provider.google-maps-api-key=
+parksense.provider.search-radius-meters=1500
+```
+
+When `parksense.provider.type=google-maps`, the backend is prepared to call the Google Places Nearby Search endpoint and map parking-related places into the recommendation pipeline.
+
 ## Planned backend flow
 
 1. Accept destination coordinates and arrival time

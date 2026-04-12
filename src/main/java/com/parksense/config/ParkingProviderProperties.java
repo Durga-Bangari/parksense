@@ -6,6 +6,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class ParkingProviderProperties {
 
     private String type = "mock";
+    private String googleMapsBaseUrl = "https://places.googleapis.com/v1";
     private String googleMapsApiKey = "";
     private int searchRadiusMeters = 1500;
 
@@ -19,6 +20,14 @@ public class ParkingProviderProperties {
 
     public String getGoogleMapsApiKey() {
         return googleMapsApiKey;
+    }
+
+    public String getGoogleMapsBaseUrl() {
+        return googleMapsBaseUrl;
+    }
+
+    public void setGoogleMapsBaseUrl(String googleMapsBaseUrl) {
+        this.googleMapsBaseUrl = googleMapsBaseUrl;
     }
 
     public void setGoogleMapsApiKey(String googleMapsApiKey) {

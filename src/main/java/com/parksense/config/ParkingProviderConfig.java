@@ -12,10 +12,11 @@ public class ParkingProviderConfig {
     @Bean
     public ParkingDataProvider parkingDataProvider(
             ParkingProviderProperties properties,
-            MockParkingDataProvider mockParkingDataProvider
+            MockParkingDataProvider mockParkingDataProvider,
+            GoogleMapsParkingDataProvider googleMapsParkingDataProvider
     ) {
         return switch (properties.getType()) {
-            case "google-maps" -> new GoogleMapsParkingDataProvider();
+            case "google-maps" -> googleMapsParkingDataProvider;
             case "mock" -> mockParkingDataProvider;
             default -> throw new IllegalArgumentException(
                     "Unsupported parking provider type: " + properties.getType()

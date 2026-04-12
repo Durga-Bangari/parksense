@@ -18,7 +18,11 @@ class ParkingProviderConfigTest {
         properties.setType("mock");
 
         ParkingDataProvider provider =
-                parkingProviderConfig.parkingDataProvider(properties, new MockParkingDataProvider());
+                parkingProviderConfig.parkingDataProvider(
+                        properties,
+                        new MockParkingDataProvider(),
+                        new GoogleMapsParkingDataProvider(null)
+                );
 
         assertInstanceOf(MockParkingDataProvider.class, provider);
     }
@@ -29,7 +33,11 @@ class ParkingProviderConfigTest {
         properties.setType("google-maps");
 
         ParkingDataProvider provider =
-                parkingProviderConfig.parkingDataProvider(properties, new MockParkingDataProvider());
+                parkingProviderConfig.parkingDataProvider(
+                        properties,
+                        new MockParkingDataProvider(),
+                        new GoogleMapsParkingDataProvider(null)
+                );
 
         assertInstanceOf(GoogleMapsParkingDataProvider.class, provider);
     }
@@ -41,7 +49,11 @@ class ParkingProviderConfigTest {
 
         assertThrows(
                 IllegalArgumentException.class,
-                () -> parkingProviderConfig.parkingDataProvider(properties, new MockParkingDataProvider())
+                () -> parkingProviderConfig.parkingDataProvider(
+                        properties,
+                        new MockParkingDataProvider(),
+                        new GoogleMapsParkingDataProvider(null)
+                )
         );
     }
 }
