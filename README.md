@@ -12,6 +12,8 @@ Drivers often spend extra time searching for parking, pay more than expected, or
 - Spring Boot
 - Maven
 - REST API
+- Spring Data JPA
+- H2 database
 
 ## Phase 1 scope
 
@@ -36,6 +38,10 @@ Drivers often spend extra time searching for parking, pay more than expected, or
 ## Phase 2 outcome
 
 Phase 2 moves ParkSense from a mock-only backend toward a real-data-ready service. The recommendation pipeline can still run locally with mock data, but it now has the provider abstractions, external client layer, fallback behavior, diagnostics, and caching needed for future website or mobile app integration.
+
+## Phase 3 direction
+
+Phase 3 adds persistence and app-backend foundations. We are starting with Spring Data JPA and an in-memory H2 database so ParkSense can begin storing backend state while staying simple to run locally.
 
 Current Phase 2 foundation:
 
@@ -198,6 +204,16 @@ The application starts on `http://localhost:8080`.
 ```bash
 mvn test
 ```
+
+### Local database console
+
+While running locally, the H2 console is available at `http://localhost:8080/h2-console`.
+
+Use these defaults:
+
+- JDBC URL: `jdbc:h2:mem:parksense`
+- username: `sa`
+- password: leave blank
 
 ### Switch to Google Maps mode
 
