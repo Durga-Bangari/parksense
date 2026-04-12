@@ -33,6 +33,7 @@ Drivers often spend extra time searching for parking, pay more than expected, or
 - Price prediction service with demand-based logic
 - Weighted recommendation scoring service
 - Rule-based recommendation explanation service
+- Main recommendation service that assembles ranked parking results
 
 ## Planned backend flow
 
