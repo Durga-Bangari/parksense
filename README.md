@@ -42,6 +42,19 @@ Current Phase 2 foundation:
 - `ParkingDataProvider` abstraction for parking data sources
 - mock provider remains the active implementation for local development
 - recommendation service now depends on a provider contract instead of concrete mock storage
+- typed provider configuration for future external API integration
+
+## Provider configuration
+
+The backend is now prepared for future external provider integration through configuration:
+
+```properties
+parksense.provider.type=mock
+parksense.provider.google-maps-api-key=
+parksense.provider.search-radius-meters=1500
+```
+
+For now, the active provider remains `mock`. Later, we can switch this configuration when a real provider such as Google Maps is added.
 
 ## Planned backend flow
 
