@@ -31,6 +31,7 @@ Drivers often spend extra time searching for parking, pay more than expected, or
 - Distance calculation utility for location-aware ranking
 - Availability prediction service with time-based heuristics
 - Price prediction service with demand-based logic
+- Weighted recommendation scoring service
 
 ## Planned backend flow
 
