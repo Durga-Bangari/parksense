@@ -3,6 +3,7 @@ package com.parksense.service;
 import com.parksense.model.ParkingRecommendation;
 import com.parksense.model.ParkingRecommendationRequest;
 import com.parksense.model.ParkingRecommendationResponse;
+import com.parksense.provider.ParkingDataProvider;
 import com.parksense.repository.ParkingSpotRepository;
 import org.junit.jupiter.api.Test;
 
@@ -15,9 +16,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ParkingRecommendationServiceTest {
 
+    private final ParkingDataProvider parkingDataProvider = new ParkingSpotRepository();
+
     private final ParkingRecommendationService parkingRecommendationService =
             new ParkingRecommendationService(
-                    new ParkingSpotRepository(),
+                    parkingDataProvider,
                     new AvailabilityPredictionService(),
                     new PricePredictionService(),
                     new RecommendationScoringService(),
@@ -38,6 +41,7 @@ class ParkingRecommendationServiceTest {
 
         assertEquals(5, recommendations.size());
         assertFalse(recommendations.isEmpty());
+        assertFalse(response.bestOptionSummary().isBlank());
         assertTrue(recommendations.get(0).score() >= recommendations.get(1).score());
     }
 

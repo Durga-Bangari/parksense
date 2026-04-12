@@ -40,7 +40,10 @@ class ParkingRecommendationControllerTest {
         );
 
         given(parkingRecommendationService.getRecommendations(any()))
-                .willReturn(new ParkingRecommendationResponse(List.of(recommendation)));
+                .willReturn(new ParkingRecommendationResponse(
+                        "Central Garage is the top recommendation based on availability, price, and distance",
+                        List.of(recommendation)
+                ));
 
         mockMvc.perform(post("/api/v1/recommendations")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -52,6 +55,8 @@ class ParkingRecommendationControllerTest {
                                 }
                                 """))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.bestOptionSummary")
+                        .value("Central Garage is the top recommendation based on availability, price, and distance"))
                 .andExpect(jsonPath("$.recommendations[0].spotId").value("P1"))
                 .andExpect(jsonPath("$.recommendations[0].spotName").value("Central Garage"))
                 .andExpect(jsonPath("$.recommendations[0].score").value(8.7));

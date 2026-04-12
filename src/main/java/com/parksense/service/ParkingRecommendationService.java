@@ -5,7 +5,7 @@ import com.parksense.model.ParkingRecommendation;
 import com.parksense.model.ParkingRecommendationRequest;
 import com.parksense.model.ParkingRecommendationResponse;
 import com.parksense.model.ParkingSpot;
-import com.parksense.repository.ParkingSpotRepository;
+import com.parksense.provider.ParkingDataProvider;
 import com.parksense.util.DistanceCalculator;
 import org.springframework.stereotype.Service;
 
@@ -15,20 +15,20 @@ import java.util.List;
 @Service
 public class ParkingRecommendationService {
 
-    private final ParkingSpotRepository parkingSpotRepository;
+    private final ParkingDataProvider parkingDataProvider;
     private final AvailabilityPredictionService availabilityPredictionService;
     private final PricePredictionService pricePredictionService;
     private final RecommendationScoringService recommendationScoringService;
     private final RecommendationExplanationService recommendationExplanationService;
 
     public ParkingRecommendationService(
-            ParkingSpotRepository parkingSpotRepository,
+            ParkingDataProvider parkingDataProvider,
             AvailabilityPredictionService availabilityPredictionService,
             PricePredictionService pricePredictionService,
             RecommendationScoringService recommendationScoringService,
             RecommendationExplanationService recommendationExplanationService
     ) {
-        this.parkingSpotRepository = parkingSpotRepository;
+        this.parkingDataProvider = parkingDataProvider;
         this.availabilityPredictionService = availabilityPredictionService;
         this.pricePredictionService = pricePredictionService;
         this.recommendationScoringService = recommendationScoringService;
@@ -38,12 +38,14 @@ public class ParkingRecommendationService {
     public ParkingRecommendationResponse getRecommendations(ParkingRecommendationRequest request) {
         Location destination = new Location(request.latitude(), request.longitude());
 
-        List<ParkingRecommendation> recommendations = parkingSpotRepository.findAll().stream()
+        List<ParkingRecommendation> recommendations = parkingDataProvider.findNearbySpots(destination).stream()
                 .map(spot -> buildRecommendation(spot, destination, request))
                 .sorted(Comparator.comparingDouble(ParkingRecommendation::score).reversed())
                 .toList();
 
-        return new ParkingRecommendationResponse(recommendations);
+        String bestOptionSummary = buildBestOptionSummary(recommendations);
+
+        return new ParkingRecommendationResponse(bestOptionSummary, recommendations);
     }
 
     private ParkingRecommendation buildRecommendation(
@@ -78,5 +80,14 @@ public class ParkingRecommendationService {
 
     private double roundToOneDecimal(double value) {
         return Math.round(value * 10.0) / 10.0;
+    }
+
+    private String buildBestOptionSummary(List<ParkingRecommendation> recommendations) {
+        if (recommendations.isEmpty()) {
+            return "No parking recommendations available for the selected destination and arrival time";
+        }
+
+        ParkingRecommendation bestRecommendation = recommendations.getFirst();
+        return bestRecommendation.spotName() + " is the top recommendation based on availability, price, and distance";
     }
 }

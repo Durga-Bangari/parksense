@@ -22,19 +22,26 @@ Drivers often spend extra time searching for parking, pay more than expected, or
 - No real ML model yet
 - No LLM integration yet
 
-## Current progress
+## Phase 1 features
 
-- Spring Boot project bootstrap
-- Health check endpoint
-- Core recommendation models
-- Mock parking spot repository with seed data
-- Distance calculation utility for location-aware ranking
-- Availability prediction service with time-based heuristics
-- Price prediction service with demand-based logic
-- Weighted recommendation scoring service
-- Rule-based recommendation explanation service
-- Main recommendation service that assembles ranked parking results
-- Request validation and centralized API error handling
+- Spring Boot REST API with layered backend structure
+- Mock parking data repository for local development
+- Time-based parking availability prediction
+- Demand-based parking price estimation
+- Weighted recommendation scoring using availability, price, and distance
+- Plain-English explanation generation for each recommendation
+- Top recommendation summary in the API response
+- Request validation and centralized error handling
+
+## Phase 2 direction
+
+Phase 2 starts by separating the recommendation engine from the mock data source. This makes the backend easier to extend into a real website or mobile app because external providers such as Google Maps can later plug into the same internal recommendation flow.
+
+Current Phase 2 foundation:
+
+- `ParkingDataProvider` abstraction for parking data sources
+- mock provider remains the active implementation for local development
+- recommendation service now depends on a provider contract instead of concrete mock storage
 
 ## Planned backend flow
 
@@ -43,7 +50,7 @@ Drivers often spend extra time searching for parking, pay more than expected, or
 3. Predict availability using time-based heuristics
 4. Predict price using demand-based logic
 5. Rank parking spots using a weighted recommendation score
-6. Return plain-English recommendation explanations
+6. Return ranked results with a best-option summary and plain-English explanations
 
 ## Project structure
 
@@ -56,9 +63,9 @@ The codebase will follow a clean layered structure as the project grows:
 - `util`
 - `exception`
 
-## Core API shape
+## API overview
 
-The recommendation API will be built around this request structure:
+The main endpoint accepts destination coordinates and an arrival time:
 
 ```json
 {
@@ -68,10 +75,11 @@ The recommendation API will be built around this request structure:
 }
 ```
 
-And will return ranked parking recommendations like:
+It returns a top recommendation summary plus ranked parking options:
 
 ```json
 {
+  "bestOptionSummary": "Central Garage is the top recommendation based on availability, price, and distance",
   "recommendations": [
     {
       "spotId": "P1",
@@ -100,6 +108,12 @@ mvn spring-boot:run
 ```
 
 The application starts on `http://localhost:8080`.
+
+### Test the application
+
+```bash
+mvn test
+```
 
 ### First endpoint
 
@@ -136,6 +150,7 @@ Example response:
 
 ```json
 {
+  "bestOptionSummary": "Central Garage is the top recommendation based on availability, price, and distance",
   "recommendations": [
     {
       "spotId": "P1",
@@ -149,6 +164,10 @@ Example response:
   ]
 }
 ```
+
+### Validation example
+
+If invalid coordinates are provided, the API returns a `400 Bad Request` response with validation details.
 
 ## Recruiter-friendly positioning
 
