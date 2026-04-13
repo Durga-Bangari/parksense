@@ -7,6 +7,7 @@ ParkSense is an AI-ready backend system for parking recommendation. In this firs
 - Phase 1: heuristic recommendation engine with mock parking data
 - Phase 2: real-data-ready provider architecture with Google Maps integration scaffolding
 - Phase 3: persistence support for search history and app-oriented backend workflows
+- Phase 4: React + TypeScript frontend for search, history, diagnostics, and sharing
 - Phase 5: destination-first search foundation with mock geocoding
 
 ## Why this project
@@ -85,7 +86,7 @@ Current Phase 5 foundation:
 
 ## Persistence flow
 
-1. A client sends `POST /api/v1/recommendations`
+1. A client sends `POST /api/v1/recommendations` or `POST /api/v1/recommendations/by-destination`
 2. ParkSense builds ranked parking recommendations
 3. The best-option summary and request metadata are stored in `search_history`
 4. A client can later call `GET /api/v1/search-history` to render recent activity
@@ -169,14 +170,15 @@ Recommendation responses now include:
 - spot coordinates for map rendering
 - `providerType` so web or mobile clients can display or debug the data source
 
-## Planned backend flow
+## Current product flow
 
-1. Accept destination coordinates and arrival time
-2. Fetch nearby parking spots from a mock provider
-3. Predict availability using time-based heuristics
-4. Predict price using demand-based logic
-5. Rank parking spots using a weighted recommendation score
-6. Return ranked results with a best-option summary and plain-English explanations
+1. Accept destination text and arrival time from the frontend
+2. Geocode the destination into coordinates through the destination provider layer
+3. Fetch nearby parking spots from the active parking data provider
+4. Predict availability using time-based heuristics
+5. Predict price using demand-based logic
+6. Rank parking spots using a weighted recommendation score
+7. Return ranked results with a best-option summary and plain-English explanations
 
 ## Project structure
 
@@ -192,7 +194,16 @@ The codebase will follow a clean layered structure as the project grows:
 
 ## API overview
 
-The main endpoint accepts destination coordinates and an arrival time:
+The current user-facing flow uses destination text and an arrival time:
+
+```json
+{
+  "destination": "Seattle Convention Center",
+  "arrivalTime": "2026-04-12T18:00:00"
+}
+```
+
+ParkSense also keeps the original coordinate-based endpoint for internal reuse, testing, and provider-level workflows:
 
 ```json
 {
@@ -391,6 +402,8 @@ Example request:
 ```
 
 This endpoint currently uses the mock geocoding provider introduced in Phase 5 and then reuses the same recommendation engine behind the coordinate-based flow.
+
+For the current frontend and real-user demo flow, this is the primary endpoint.
 
 Example response:
 
