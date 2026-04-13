@@ -49,6 +49,12 @@ type SearchForm = {
   arrivalTime: string;
 };
 
+type SearchPreset = {
+  label: string;
+  description: string;
+  form: SearchForm;
+};
+
 const configuredApiBaseUrl = import.meta.env.VITE_API_BASE_URL?.trim();
 
 const API_BASE_URL = configuredApiBaseUrl
@@ -67,6 +73,36 @@ const initialFormState: SearchForm = {
   longitude: "-122.3",
   arrivalTime: "2026-04-12T18:00"
 };
+
+const searchPresets: SearchPreset[] = [
+  {
+    label: "Downtown Evening",
+    description: "Seattle core with after-work demand",
+    form: {
+      latitude: "47.6062",
+      longitude: "-122.3321",
+      arrivalTime: "2026-04-12T18:00"
+    }
+  },
+  {
+    label: "Waterfront Lunch",
+    description: "Midday parking near the waterfront",
+    form: {
+      latitude: "47.6075",
+      longitude: "-122.3425",
+      arrivalTime: "2026-04-12T12:30"
+    }
+  },
+  {
+    label: "Weekend Market",
+    description: "Weekend morning search near Pike Place",
+    form: {
+      latitude: "47.6097",
+      longitude: "-122.3425",
+      arrivalTime: "2026-04-18T10:00"
+    }
+  }
+];
 
 function buildGoogleMapsLink(latitude: number, longitude: number) {
   return `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
@@ -220,6 +256,23 @@ function App() {
             <p>Use the live backend API to rank nearby parking options.</p>
           </div>
 
+          <div className="preset-grid">
+            {searchPresets.map((preset) => (
+              <button
+                key={preset.label}
+                className="preset-card"
+                type="button"
+                onClick={() => {
+                  setForm(preset.form);
+                  setErrorMessage("");
+                }}
+              >
+                <strong>{preset.label}</strong>
+                <span>{preset.description}</span>
+              </button>
+            ))}
+          </div>
+
           <label className="field-group">
             <span>Latitude</span>
             <input
@@ -269,6 +322,17 @@ function App() {
 
           <button className="submit-button" type="submit" disabled={isLoading}>
             {isLoading ? "Loading Recommendations..." : "Get Recommendations"}
+          </button>
+
+          <button
+            className="reset-button"
+            type="button"
+            onClick={() => {
+              setForm(initialFormState);
+              setErrorMessage("");
+            }}
+          >
+            Reset to default search
           </button>
 
           {errorMessage ? <p className="status-error">{errorMessage}</p> : null}
