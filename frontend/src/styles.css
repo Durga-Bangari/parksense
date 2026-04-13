@@ -345,6 +345,29 @@ a {
   font-weight: 600;
 }
 
+.location-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  margin-top: 12px;
+}
+
+.map-link {
+  color: #1b6280;
+  font-weight: 700;
+}
+
+.map-link:hover {
+  text-decoration: underline;
+}
+
+.location-coordinates {
+  color: #64809a;
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+
 .result-explanation {
   margin: 14px 0 0;
   color: #38516d;

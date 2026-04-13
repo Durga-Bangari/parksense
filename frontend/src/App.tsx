@@ -68,6 +68,10 @@ const initialFormState: SearchForm = {
   arrivalTime: "2026-04-12T18:00"
 };
 
+function buildGoogleMapsLink(latitude: number, longitude: number) {
+  return `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
+}
+
 function App() {
   const [form, setForm] = useState<SearchForm>(initialFormState);
   const [result, setResult] = useState<RecommendationResponse | null>(null);
@@ -396,6 +400,23 @@ function App() {
 
                 <h3>{recommendation.spotName}</h3>
                 <p className="result-address">{recommendation.address}</p>
+                <div className="location-actions">
+                  <a
+                    className="map-link"
+                    href={buildGoogleMapsLink(
+                      recommendation.latitude,
+                      recommendation.longitude
+                    )}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Open in Google Maps
+                  </a>
+                  <span className="location-coordinates">
+                    {recommendation.latitude.toFixed(4)},{" "}
+                    {recommendation.longitude.toFixed(4)}
+                  </span>
+                </div>
                 <p className="result-explanation">{recommendation.explanation}</p>
 
                 <dl className="metric-grid">
@@ -463,6 +484,19 @@ function App() {
                 </div>
 
                 <p className="history-summary">{historyItem.bestOptionSummary}</p>
+                <div className="location-actions">
+                  <a
+                    className="map-link"
+                    href={buildGoogleMapsLink(
+                      historyItem.latitude,
+                      historyItem.longitude
+                    )}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Open search area in Google Maps
+                  </a>
+                </div>
 
                 <dl className="metric-grid">
                   <div>
