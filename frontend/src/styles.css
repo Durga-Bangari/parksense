@@ -408,10 +408,19 @@ a {
 .map-link {
   color: #1b6280;
   font-weight: 700;
+  background: transparent;
+  border: none;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
 }
 
 .map-link:hover {
   text-decoration: underline;
+}
+
+.action-link {
+  text-align: left;
 }
 
 .location-coordinates {

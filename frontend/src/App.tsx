@@ -108,6 +108,10 @@ function buildGoogleMapsLink(latitude: number, longitude: number) {
   return `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
 }
 
+function toDatetimeLocalValue(dateTime: string) {
+  return dateTime.slice(0, 16);
+}
+
 function App() {
   const [form, setForm] = useState<SearchForm>(initialFormState);
   const [result, setResult] = useState<RecommendationResponse | null>(null);
@@ -560,6 +564,21 @@ function App() {
                   >
                     Open search area in Google Maps
                   </a>
+                  <button
+                    className="map-link action-link"
+                    type="button"
+                    onClick={() => {
+                      setForm({
+                        latitude: historyItem.latitude.toString(),
+                        longitude: historyItem.longitude.toString(),
+                        arrivalTime: toDatetimeLocalValue(historyItem.arrivalTime)
+                      });
+                      setErrorMessage("");
+                      window.scrollTo({ top: 0, behavior: "smooth" });
+                    }}
+                  >
+                    Use this search
+                  </button>
                 </div>
 
                 <dl className="metric-grid">
