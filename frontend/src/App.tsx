@@ -29,6 +29,20 @@ type SearchHistoryItem = {
   bestOptionSummary: string;
 };
 
+type ProviderDiagnostics = {
+  configuredProviderType: string;
+  activeProviderType: string;
+  providerReady: boolean;
+  statusMessage: string;
+  fallbackToMockOnFailure: boolean;
+  searchRadiusMeters: number;
+};
+
+type HealthResponse = {
+  status: string;
+  application: string;
+};
+
 type SearchForm = {
   latitude: string;
   longitude: string;
@@ -54,10 +68,17 @@ function App() {
   const [form, setForm] = useState<SearchForm>(initialFormState);
   const [result, setResult] = useState<RecommendationResponse | null>(null);
   const [historyItems, setHistoryItems] = useState<SearchHistoryItem[]>([]);
+  const [providerDiagnostics, setProviderDiagnostics] =
+    useState<ProviderDiagnostics | null>(null);
+  const [healthStatus, setHealthStatus] = useState<HealthResponse | null>(null);
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [historyErrorMessage, setHistoryErrorMessage] = useState<string>("");
+  const [diagnosticsErrorMessage, setDiagnosticsErrorMessage] =
+    useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isHistoryLoading, setIsHistoryLoading] = useState<boolean>(true);
+  const [isDiagnosticsLoading, setIsDiagnosticsLoading] =
+    useState<boolean>(true);
 
   async function loadRecentSearches() {
     setIsHistoryLoading(true);
@@ -82,8 +103,40 @@ function App() {
     }
   }
 
+  async function loadDiagnostics() {
+    setIsDiagnosticsLoading(true);
+    setDiagnosticsErrorMessage("");
+
+    try {
+      const [healthResponse, providerResponse] = await Promise.all([
+        fetch(`${API_BASE_URL}/health`),
+        fetch(`${API_BASE_URL}/provider`)
+      ]);
+
+      if (!healthResponse.ok || !providerResponse.ok) {
+        throw new Error("Unable to load backend diagnostics.");
+      }
+
+      const healthPayload = (await healthResponse.json()) as HealthResponse;
+      const providerPayload =
+        (await providerResponse.json()) as ProviderDiagnostics;
+
+      setHealthStatus(healthPayload);
+      setProviderDiagnostics(providerPayload);
+    } catch {
+      setDiagnosticsErrorMessage(
+        "Backend diagnostics are unavailable right now. Start the API to view system status."
+      );
+      setHealthStatus(null);
+      setProviderDiagnostics(null);
+    } finally {
+      setIsDiagnosticsLoading(false);
+    }
+  }
+
   useEffect(() => {
     void loadRecentSearches();
+    void loadDiagnostics();
   }, []);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -221,6 +274,98 @@ function App() {
             <p>{highlight}</p>
           </article>
         ))}
+      </section>
+
+      <section className="status-panel">
+        <div className="results-header">
+          <div>
+            <span className="card-label">System Status</span>
+            <h2>Backend and provider readiness</h2>
+          </div>
+          <button
+            className="secondary-link refresh-button"
+            type="button"
+            onClick={() => {
+              void loadDiagnostics();
+            }}
+            disabled={isDiagnosticsLoading}
+          >
+            {isDiagnosticsLoading ? "Refreshing..." : "Refresh Status"}
+          </button>
+        </div>
+
+        {diagnosticsErrorMessage ? (
+          <p className="status-error history-status">{diagnosticsErrorMessage}</p>
+        ) : null}
+
+        {healthStatus && providerDiagnostics ? (
+          <div className="status-grid">
+            <article className="status-card">
+              <div className="status-topline">
+                <span className="result-provider">Backend</span>
+                <span
+                  className={
+                    healthStatus.status === "UP" ? "status-pill is-good" : "status-pill"
+                  }
+                >
+                  {healthStatus.status}
+                </span>
+              </div>
+              <h3>{healthStatus.application}</h3>
+              <p className="result-explanation">
+                The Spring Boot API is reachable and ready to serve frontend requests.
+              </p>
+            </article>
+
+            <article className="status-card">
+              <div className="status-topline">
+                <span className="result-provider">Provider</span>
+                <span
+                  className={
+                    providerDiagnostics.providerReady
+                      ? "status-pill is-good"
+                      : "status-pill is-warning"
+                  }
+                >
+                  {providerDiagnostics.providerReady ? "Ready" : "Needs attention"}
+                </span>
+              </div>
+              <h3>{providerDiagnostics.activeProviderType}</h3>
+              <p className="result-explanation">
+                {providerDiagnostics.statusMessage}
+              </p>
+
+              <dl className="metric-grid">
+                <div>
+                  <dt>Configured</dt>
+                  <dd>{providerDiagnostics.configuredProviderType}</dd>
+                </div>
+                <div>
+                  <dt>Fallback</dt>
+                  <dd>
+                    {providerDiagnostics.fallbackToMockOnFailure ? "Enabled" : "Disabled"}
+                  </dd>
+                </div>
+                <div>
+                  <dt>Radius</dt>
+                  <dd>{providerDiagnostics.searchRadiusMeters} m</dd>
+                </div>
+                <div>
+                  <dt>Mode</dt>
+                  <dd>{providerDiagnostics.activeProviderType}</dd>
+                </div>
+              </dl>
+            </article>
+          </div>
+        ) : (
+          <div className="empty-state">
+            <p>
+              {isDiagnosticsLoading
+                ? "Loading backend diagnostics from ParkSense..."
+                : "Backend health and provider readiness will appear here once the API is available."}
+            </p>
+          </div>
+        )}
       </section>
 
       <section className="results-panel">

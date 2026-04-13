@@ -215,6 +215,15 @@ a {
   box-shadow: 0 20px 36px rgba(26, 66, 99, 0.1);
 }
 
+.status-panel {
+  margin-top: 24px;
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(19, 34, 56, 0.08);
+  border-radius: 28px;
+  padding: 28px;
+  box-shadow: 0 20px 36px rgba(26, 66, 99, 0.1);
+}
+
 .history-panel {
   margin-top: 24px;
   background: rgba(255, 255, 255, 0.82);
@@ -252,6 +261,54 @@ a {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 18px;
   margin-top: 24px;
+}
+
+.status-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 24px;
+}
+
+.status-card {
+  background: #fdfefe;
+  border: 1px solid rgba(19, 34, 56, 0.08);
+  border-radius: 22px;
+  padding: 22px;
+  box-shadow: 0 14px 26px rgba(23, 58, 86, 0.08);
+}
+
+.status-topline {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+}
+
+.status-card h3 {
+  margin: 14px 0 8px;
+  font-size: 1.5rem;
+}
+
+.status-pill {
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: #e9eff4;
+  color: #45607c;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.status-pill.is-good {
+  background: #e5f6ee;
+  color: #1f7753;
+}
+
+.status-pill.is-warning {
+  background: #fff1df;
+  color: #a96518;
 }
 
 .result-card {
@@ -380,6 +437,7 @@ a {
   }
 
   .info-grid,
+  .status-grid,
   .history-grid,
   .results-grid,
   .metric-grid {
