@@ -107,4 +107,35 @@ class ParkingRecommendationControllerTest {
                 .andExpect(jsonPath("$.error").value("Validation failed"))
                 .andExpect(jsonPath("$.details[0]").value("latitude must be less than or equal to 90"));
     }
+
+    @Test
+    void returnsBadRequestWhenLatitudeIsMissing() throws Exception {
+        mockMvc.perform(post("/api/v1/recommendations")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "longitude": -122.3,
+                                  "arrivalTime": "2026-04-12T18:00:00"
+                                }
+                                """))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value("Validation failed"))
+                .andExpect(jsonPath("$.details[0]").value("latitude is required"));
+    }
+
+    @Test
+    void returnsBadRequestForMalformedArrivalTime() throws Exception {
+        mockMvc.perform(post("/api/v1/recommendations")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "latitude": 47.6,
+                                  "longitude": -122.3,
+                                  "arrivalTime": "not-a-date"
+                                }
+                                """))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value("Validation failed"))
+                .andExpect(jsonPath("$.details[0]").value("Request body contains invalid or malformed data"));
+    }
 }
