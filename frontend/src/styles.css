@@ -242,6 +242,18 @@ a {
   text-decoration: underline;
 }
 
+.inline-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.share-message {
+  margin: -4px 0 0;
+  color: #1f7753;
+  font-weight: 700;
+}
+
 .submit-button:disabled {
   opacity: 0.72;
   cursor: wait;

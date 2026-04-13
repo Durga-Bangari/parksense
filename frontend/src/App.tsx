@@ -133,6 +133,7 @@ function App() {
   const [historyErrorMessage, setHistoryErrorMessage] = useState<string>("");
   const [diagnosticsErrorMessage, setDiagnosticsErrorMessage] =
     useState<string>("");
+  const [shareMessage, setShareMessage] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isHistoryLoading, setIsHistoryLoading] = useState<boolean>(true);
   const [isDiagnosticsLoading, setIsDiagnosticsLoading] =
@@ -206,6 +207,17 @@ function App() {
     const nextUrl = `${window.location.pathname}?${searchParams.toString()}`;
     window.history.replaceState(null, "", nextUrl);
   }, [form]);
+
+  async function handleCopyShareLink() {
+    const shareUrl = window.location.href;
+
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setShareMessage("Share link copied.");
+    } catch {
+      setShareMessage("Unable to copy automatically. Copy the URL from the browser.");
+    }
+  }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -348,16 +360,30 @@ function App() {
             {isLoading ? "Loading Recommendations..." : "Get Recommendations"}
           </button>
 
-          <button
-            className="reset-button"
-            type="button"
-            onClick={() => {
-              setForm(initialFormState);
-              setErrorMessage("");
-            }}
-          >
-            Reset to default search
-          </button>
+          <div className="inline-actions">
+            <button
+              className="reset-button"
+              type="button"
+              onClick={() => {
+                setForm(initialFormState);
+                setErrorMessage("");
+                setShareMessage("");
+              }}
+            >
+              Reset to default search
+            </button>
+            <button
+              className="reset-button"
+              type="button"
+              onClick={() => {
+                void handleCopyShareLink();
+              }}
+            >
+              Copy share link
+            </button>
+          </div>
+
+          {shareMessage ? <p className="share-message">{shareMessage}</p> : null}
 
           {errorMessage ? <p className="status-error">{errorMessage}</p> : null}
         </form>
