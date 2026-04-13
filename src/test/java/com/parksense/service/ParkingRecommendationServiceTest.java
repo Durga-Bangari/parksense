@@ -1,6 +1,10 @@
 package com.parksense.service;
 
+import com.parksense.exception.DestinationNotFoundException;
+import com.parksense.geocoding.DestinationGeocodingProvider;
+import com.parksense.geocoding.MockDestinationGeocodingProvider;
 import com.parksense.model.ParkingRecommendation;
+import com.parksense.model.DestinationRecommendationRequest;
 import com.parksense.model.ParkingRecommendationRequest;
 import com.parksense.model.ParkingRecommendationResponse;
 import com.parksense.provider.MockParkingDataProvider;
@@ -21,11 +25,14 @@ import static org.mockito.Mockito.verify;
 
 class ParkingRecommendationServiceTest {
 
+    private final DestinationGeocodingProvider destinationGeocodingProvider =
+            new MockDestinationGeocodingProvider();
     private final ParkingDataProvider parkingDataProvider = new MockParkingDataProvider();
     private final SearchHistoryRepository searchHistoryRepository = mock(SearchHistoryRepository.class);
 
     private final ParkingRecommendationService parkingRecommendationService =
             new ParkingRecommendationService(
+                    destinationGeocodingProvider,
                     parkingDataProvider,
                     new AvailabilityPredictionService(),
                     new PricePredictionService(),
@@ -75,5 +82,33 @@ class ParkingRecommendationServiceTest {
         assertTrue(firstRecommendation.predictedAvailability() >= 0.0);
         assertTrue(firstRecommendation.predictedPrice() > 0.0);
         assertFalse(firstRecommendation.explanation().isBlank());
+    }
+
+    @Test
+    void returnsRankedRecommendationsForDestinationRequest() {
+        DestinationRecommendationRequest request = new DestinationRecommendationRequest(
+                "Space Needle",
+                LocalDateTime.of(2026, 4, 14, 18, 0)
+        );
+
+        ParkingRecommendationResponse response =
+                parkingRecommendationService.getRecommendationsByDestination(request);
+
+        assertFalse(response.recommendations().isEmpty());
+        assertFalse(response.bestOptionSummary().isBlank());
+        verify(searchHistoryRepository, times(1)).save(any());
+    }
+
+    @Test
+    void throwsWhenDestinationCannotBeResolved() {
+        DestinationRecommendationRequest request = new DestinationRecommendationRequest(
+                "Unknown Place",
+                LocalDateTime.of(2026, 4, 14, 18, 0)
+        );
+
+        org.junit.jupiter.api.Assertions.assertThrows(
+                DestinationNotFoundException.class,
+                () -> parkingRecommendationService.getRecommendationsByDestination(request)
+        );
     }
 }

@@ -81,6 +81,7 @@ Current Phase 5 foundation:
 - `DestinationGeocodingProvider` abstraction for destination lookup
 - mock geocoding provider for local development and demos
 - seeded destinations such as Seattle Convention Center, Pike Place Market, Space Needle, and Seattle Waterfront
+- destination-based recommendation endpoint that geocodes a place name before ranking parking options
 
 ## Persistence flow
 
@@ -371,6 +372,23 @@ Example request:
   "arrivalTime": "2026-04-12T18:00:00"
 }
 ```
+
+### Destination recommendation endpoint
+
+```bash
+POST /api/v1/recommendations/by-destination
+```
+
+Example request:
+
+```json
+{
+  "destination": "Seattle Convention Center",
+  "arrivalTime": "2026-04-12T18:00:00"
+}
+```
+
+This endpoint currently uses the mock geocoding provider introduced in Phase 5 and then reuses the same recommendation engine behind the coordinate-based flow.
 
 Example response:
 

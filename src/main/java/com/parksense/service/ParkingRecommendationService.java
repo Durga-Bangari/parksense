@@ -1,5 +1,9 @@
 package com.parksense.service;
 
+import com.parksense.exception.DestinationNotFoundException;
+import com.parksense.geocoding.DestinationGeocodingProvider;
+import com.parksense.model.DestinationRecommendationRequest;
+import com.parksense.model.GeocodedDestination;
 import com.parksense.model.Location;
 import com.parksense.model.ParkingRecommendation;
 import com.parksense.model.ParkingRecommendationRequest;
@@ -18,6 +22,7 @@ import java.util.List;
 @Service
 public class ParkingRecommendationService {
 
+    private final DestinationGeocodingProvider destinationGeocodingProvider;
     private final ParkingDataProvider parkingDataProvider;
     private final AvailabilityPredictionService availabilityPredictionService;
     private final PricePredictionService pricePredictionService;
@@ -26,6 +31,7 @@ public class ParkingRecommendationService {
     private final SearchHistoryRepository searchHistoryRepository;
 
     public ParkingRecommendationService(
+            DestinationGeocodingProvider destinationGeocodingProvider,
             ParkingDataProvider parkingDataProvider,
             AvailabilityPredictionService availabilityPredictionService,
             PricePredictionService pricePredictionService,
@@ -33,6 +39,7 @@ public class ParkingRecommendationService {
             RecommendationExplanationService recommendationExplanationService,
             SearchHistoryRepository searchHistoryRepository
     ) {
+        this.destinationGeocodingProvider = destinationGeocodingProvider;
         this.parkingDataProvider = parkingDataProvider;
         this.availabilityPredictionService = availabilityPredictionService;
         this.pricePredictionService = pricePredictionService;
@@ -42,24 +49,41 @@ public class ParkingRecommendationService {
     }
 
     public ParkingRecommendationResponse getRecommendations(ParkingRecommendationRequest request) {
-        Location destination = new Location(request.latitude(), request.longitude());
+        return getRecommendationsForLocation(
+                new Location(request.latitude(), request.longitude()),
+                request.arrivalTime()
+        );
+    }
 
+    public ParkingRecommendationResponse getRecommendationsByDestination(
+            DestinationRecommendationRequest request
+    ) {
+        GeocodedDestination geocodedDestination = destinationGeocodingProvider.geocode(request.destination())
+                .orElseThrow(() -> new DestinationNotFoundException(request.destination()));
+
+        return getRecommendationsForLocation(geocodedDestination.location(), request.arrivalTime());
+    }
+
+    private ParkingRecommendationResponse getRecommendationsForLocation(
+            Location destination,
+            LocalDateTime arrivalTime
+    ) {
         List<ParkingRecommendation> recommendations = parkingDataProvider.findNearbySpots(destination).stream()
-                .map(spot -> buildRecommendation(spot, destination, request))
+                .map(spot -> buildRecommendation(spot, destination, arrivalTime))
                 .sorted(Comparator.comparingDouble(ParkingRecommendation::score).reversed())
                 .toList();
 
         String bestOptionSummary = buildBestOptionSummary(recommendations);
-        saveSearchHistory(request, bestOptionSummary);
+        saveSearchHistory(destination, arrivalTime, bestOptionSummary);
 
         return new ParkingRecommendationResponse(bestOptionSummary, recommendations);
     }
 
-    private void saveSearchHistory(ParkingRecommendationRequest request, String bestOptionSummary) {
+    private void saveSearchHistory(Location destination, LocalDateTime arrivalTime, String bestOptionSummary) {
         SearchHistory searchHistory = new SearchHistory(
-                request.latitude(),
-                request.longitude(),
-                request.arrivalTime(),
+                destination.latitude(),
+                destination.longitude(),
+                arrivalTime,
                 LocalDateTime.now(),
                 bestOptionSummary
         );
@@ -70,11 +94,11 @@ public class ParkingRecommendationService {
     private ParkingRecommendation buildRecommendation(
             ParkingSpot parkingSpot,
             Location destination,
-            ParkingRecommendationRequest request
+            LocalDateTime arrivalTime
     ) {
         double distanceMeters = DistanceCalculator.calculateDistanceMeters(destination, parkingSpot.location());
-        double predictedAvailability = availabilityPredictionService.predictAvailability(request.arrivalTime());
-        double predictedPrice = pricePredictionService.predictPrice(parkingSpot, request.arrivalTime());
+        double predictedAvailability = availabilityPredictionService.predictAvailability(arrivalTime);
+        double predictedPrice = pricePredictionService.predictPrice(parkingSpot, arrivalTime);
         double score = recommendationScoringService.calculateScore(
                 predictedAvailability,
                 predictedPrice,

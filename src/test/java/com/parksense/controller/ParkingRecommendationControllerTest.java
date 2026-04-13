@@ -74,6 +74,43 @@ class ParkingRecommendationControllerTest {
     }
 
     @Test
+    void returnsRankedParkingRecommendationsForDestinationRequest() throws Exception {
+        ParkingRecommendation recommendation = new ParkingRecommendation(
+                "P1",
+                "Central Garage",
+                "1200 4th Ave, Seattle, WA",
+                "garage",
+                47.6097,
+                -122.3331,
+                "mock",
+                200.0,
+                0.75,
+                12.50,
+                8.7,
+                "High availability and low price"
+        );
+
+        given(parkingRecommendationService.getRecommendationsByDestination(any()))
+                .willReturn(new ParkingRecommendationResponse(
+                        "Central Garage is the top recommendation based on availability, price, and distance",
+                        List.of(recommendation)
+                ));
+
+        mockMvc.perform(post("/api/v1/recommendations/by-destination")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "destination": "Seattle Convention Center",
+                                  "arrivalTime": "2026-04-12T18:00:00"
+                                }
+                                """))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.bestOptionSummary")
+                        .value("Central Garage is the top recommendation based on availability, price, and distance"))
+                .andExpect(jsonPath("$.recommendations[0].spotName").value("Central Garage"));
+    }
+
+    @Test
     void returnsBadGatewayWhenProviderRequestFails() throws Exception {
         given(parkingRecommendationService.getRecommendations(any()))
                 .willThrow(new ExternalProviderException("google-maps", "Google Maps nearby search request failed"));
@@ -137,5 +174,20 @@ class ParkingRecommendationControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error").value("Validation failed"))
                 .andExpect(jsonPath("$.details[0]").value("Request body contains invalid or malformed data"));
+    }
+
+    @Test
+    void returnsBadRequestWhenDestinationIsMissing() throws Exception {
+        mockMvc.perform(post("/api/v1/recommendations/by-destination")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "destination": " ",
+                                  "arrivalTime": "2026-04-12T18:00:00"
+                                }
+                                """))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value("Validation failed"))
+                .andExpect(jsonPath("$.details[0]").value("destination is required"));
     }
 }

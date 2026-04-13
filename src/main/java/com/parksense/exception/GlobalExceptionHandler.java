@@ -59,6 +59,17 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(errorResponse);
     }
 
+    @ExceptionHandler(DestinationNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleDestinationNotFoundException(DestinationNotFoundException exception) {
+        ErrorResponse errorResponse = buildErrorResponse(
+                HttpStatus.NOT_FOUND,
+                "Destination not found",
+                List.of(exception.getMessage())
+        );
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+    }
+
     private ErrorResponse buildErrorResponse(HttpStatus status, String error, List<String> details) {
         return new ErrorResponse(
                 LocalDateTime.now(),

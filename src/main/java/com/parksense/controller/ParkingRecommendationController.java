@@ -1,5 +1,6 @@
 package com.parksense.controller;
 
+import com.parksense.model.DestinationRecommendationRequest;
 import com.parksense.model.ParkingRecommendationRequest;
 import com.parksense.model.ParkingRecommendationResponse;
 import com.parksense.service.ParkingRecommendationService;
@@ -22,5 +23,12 @@ public class ParkingRecommendationController {
     @PostMapping
     public ParkingRecommendationResponse getRecommendations(@Valid @RequestBody ParkingRecommendationRequest request) {
         return parkingRecommendationService.getRecommendations(request);
+    }
+
+    @PostMapping("/by-destination")
+    public ParkingRecommendationResponse getRecommendationsByDestination(
+            @Valid @RequestBody DestinationRecommendationRequest request
+    ) {
+        return parkingRecommendationService.getRecommendationsByDestination(request);
     }
 }
