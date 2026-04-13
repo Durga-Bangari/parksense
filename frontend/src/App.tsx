@@ -44,8 +44,7 @@ type HealthResponse = {
 };
 
 type SearchForm = {
-  latitude: string;
-  longitude: string;
+  destination: string;
   arrivalTime: string;
 };
 
@@ -69,8 +68,7 @@ const highlights: string[] = [
 ];
 
 const initialFormState: SearchForm = {
-  latitude: "47.6",
-  longitude: "-122.3",
+  destination: "Seattle Convention Center",
   arrivalTime: "2026-04-12T18:00"
 };
 
@@ -79,8 +77,7 @@ const searchPresets: SearchPreset[] = [
     label: "Downtown Evening",
     description: "Seattle core with after-work demand",
     form: {
-      latitude: "47.6062",
-      longitude: "-122.3321",
+      destination: "Seattle Convention Center",
       arrivalTime: "2026-04-12T18:00"
     }
   },
@@ -88,8 +85,7 @@ const searchPresets: SearchPreset[] = [
     label: "Waterfront Lunch",
     description: "Midday parking near the waterfront",
     form: {
-      latitude: "47.6075",
-      longitude: "-122.3425",
+      destination: "Seattle Waterfront",
       arrivalTime: "2026-04-12T12:30"
     }
   },
@@ -97,8 +93,7 @@ const searchPresets: SearchPreset[] = [
     label: "Weekend Market",
     description: "Weekend morning search near Pike Place",
     form: {
-      latitude: "47.6097",
-      longitude: "-122.3425",
+      destination: "Pike Place Market",
       arrivalTime: "2026-04-18T10:00"
     }
   }
@@ -108,16 +103,11 @@ function buildGoogleMapsLink(latitude: number, longitude: number) {
   return `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
 }
 
-function toDatetimeLocalValue(dateTime: string) {
-  return dateTime.slice(0, 16);
-}
-
 function readFormFromUrl(): SearchForm {
   const searchParams = new URLSearchParams(window.location.search);
 
   return {
-    latitude: searchParams.get("latitude") ?? initialFormState.latitude,
-    longitude: searchParams.get("longitude") ?? initialFormState.longitude,
+    destination: searchParams.get("destination") ?? initialFormState.destination,
     arrivalTime: searchParams.get("arrivalTime") ?? initialFormState.arrivalTime
   };
 }
@@ -200,8 +190,7 @@ function App() {
 
   useEffect(() => {
     const searchParams = new URLSearchParams();
-    searchParams.set("latitude", form.latitude);
-    searchParams.set("longitude", form.longitude);
+    searchParams.set("destination", form.destination);
     searchParams.set("arrivalTime", form.arrivalTime);
 
     const nextUrl = `${window.location.pathname}?${searchParams.toString()}`;
@@ -225,14 +214,13 @@ function App() {
     setErrorMessage("");
 
     try {
-      const response = await fetch(`${API_BASE_URL}/recommendations`, {
+      const response = await fetch(`${API_BASE_URL}/recommendations/by-destination`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          latitude: Number(form.latitude),
-          longitude: Number(form.longitude),
+          destination: form.destination,
           arrivalTime: form.arrivalTime
         })
       });
@@ -272,7 +260,7 @@ function App() {
           <p className="eyebrow">ParkSense</p>
           <h1>Find a stronger parking option before you even leave.</h1>
           <p className="hero-copy">
-            Search by destination coordinates and arrival time to get ranked
+            Search by destination and arrival time to get ranked
             parking recommendations from the ParkSense backend.
           </p>
 
@@ -289,7 +277,7 @@ function App() {
         <form className="search-panel" onSubmit={handleSubmit}>
           <div className="panel-header">
             <span className="card-label">Recommendation Search</span>
-            <p>Use the live backend API to rank nearby parking options.</p>
+            <p>Search by destination name and arrival time to rank nearby parking options.</p>
           </div>
 
           <div className="preset-grid">
@@ -310,31 +298,15 @@ function App() {
           </div>
 
           <label className="field-group">
-            <span>Latitude</span>
+            <span>Destination</span>
             <input
-              type="number"
-              step="0.0001"
-              value={form.latitude}
+              type="text"
+              placeholder="Seattle Convention Center"
+              value={form.destination}
               onChange={(event) =>
                 setForm((currentForm) => ({
                   ...currentForm,
-                  latitude: event.target.value
-                }))
-              }
-              required
-            />
-          </label>
-
-          <label className="field-group">
-            <span>Longitude</span>
-            <input
-              type="number"
-              step="0.0001"
-              value={form.longitude}
-              onChange={(event) =>
-                setForm((currentForm) => ({
-                  ...currentForm,
-                  longitude: event.target.value
+                  destination: event.target.value
                 }))
               }
               required
@@ -610,21 +582,6 @@ function App() {
                   >
                     Open search area in Google Maps
                   </a>
-                  <button
-                    className="map-link action-link"
-                    type="button"
-                    onClick={() => {
-                      setForm({
-                        latitude: historyItem.latitude.toString(),
-                        longitude: historyItem.longitude.toString(),
-                        arrivalTime: toDatetimeLocalValue(historyItem.arrivalTime)
-                      });
-                      setErrorMessage("");
-                      window.scrollTo({ top: 0, behavior: "smooth" });
-                    }}
-                  >
-                    Use this search
-                  </button>
                 </div>
 
                 <dl className="metric-grid">

@@ -255,6 +255,8 @@ The frontend also keeps the current search form in the URL query string so a rec
 
 The frontend now uses the TypeScript React app under `frontend/src/*.tsx`; the original JavaScript scaffold files were removed during cleanup.
 
+The current frontend experience is destination-first: users enter a place name and arrival time, while the backend handles geocoding before ranking parking options.
+
 ### Test the application
 
 ```bash
