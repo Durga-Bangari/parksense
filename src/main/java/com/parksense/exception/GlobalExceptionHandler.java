@@ -41,7 +41,7 @@ public class GlobalExceptionHandler {
     ) {
         ErrorResponse errorResponse = buildErrorResponse(
                 HttpStatus.SERVICE_UNAVAILABLE,
-                "Parking data provider is not configured",
+                "External provider is not configured",
                 List.of(exception.getMessage())
         );
 
@@ -52,7 +52,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleExternalProviderException(ExternalProviderException exception) {
         ErrorResponse errorResponse = buildErrorResponse(
                 HttpStatus.BAD_GATEWAY,
-                "Parking data provider request failed",
+                "External provider request failed",
                 List.of(exception.getMessage())
         );
 

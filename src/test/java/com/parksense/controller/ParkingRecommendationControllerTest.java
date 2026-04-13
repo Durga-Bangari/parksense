@@ -125,7 +125,7 @@ class ParkingRecommendationControllerTest {
                                 }
                                 """))
                 .andExpect(status().isBadGateway())
-                .andExpect(jsonPath("$.error").value("Parking data provider request failed"))
+                .andExpect(jsonPath("$.error").value("External provider request failed"))
                 .andExpect(jsonPath("$.details[0]").value("Google Maps nearby search request failed"));
     }
 

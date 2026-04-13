@@ -18,7 +18,8 @@ Current Phase 6 foundation:
 
 - configurable geocoding provider selection
 - default mock geocoding for local development
-- Google Maps geocoding provider placeholder for the real integration path
+- typed Google Maps geocoding client and DTOs for the real integration path
+- Google Maps geocoding provider wired to resolve real destinations when selected
 
 ## Why this project
 

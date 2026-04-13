@@ -3,10 +3,12 @@ package com.parksense.config;
 import com.parksense.geocoding.DestinationGeocodingProvider;
 import com.parksense.geocoding.GoogleMapsDestinationGeocodingProvider;
 import com.parksense.geocoding.MockDestinationGeocodingProvider;
+import com.parksense.integration.googlemaps.client.GoogleMapsGeocodingClient;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mock;
 
 class GeocodingProviderConfigTest {
 
@@ -21,7 +23,7 @@ class GeocodingProviderConfigTest {
                 geocodingProviderConfig.destinationGeocodingProvider(
                         properties,
                         new MockDestinationGeocodingProvider(),
-                        new GoogleMapsDestinationGeocodingProvider()
+                        new GoogleMapsDestinationGeocodingProvider(mock(GoogleMapsGeocodingClient.class))
                 );
 
         assertInstanceOf(MockDestinationGeocodingProvider.class, provider);
@@ -36,7 +38,7 @@ class GeocodingProviderConfigTest {
                 geocodingProviderConfig.destinationGeocodingProvider(
                         properties,
                         new MockDestinationGeocodingProvider(),
-                        new GoogleMapsDestinationGeocodingProvider()
+                        new GoogleMapsDestinationGeocodingProvider(mock(GoogleMapsGeocodingClient.class))
                 );
 
         assertInstanceOf(GoogleMapsDestinationGeocodingProvider.class, provider);
@@ -52,7 +54,7 @@ class GeocodingProviderConfigTest {
                 () -> geocodingProviderConfig.destinationGeocodingProvider(
                         properties,
                         new MockDestinationGeocodingProvider(),
-                        new GoogleMapsDestinationGeocodingProvider()
+                        new GoogleMapsDestinationGeocodingProvider(mock(GoogleMapsGeocodingClient.class))
                 )
         );
     }
