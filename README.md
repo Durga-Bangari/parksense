@@ -7,6 +7,7 @@ ParkSense is an AI-ready backend system for parking recommendation. In this firs
 - Phase 1: heuristic recommendation engine with mock parking data
 - Phase 2: real-data-ready provider architecture with Google Maps integration scaffolding
 - Phase 3: persistence support for search history and app-oriented backend workflows
+- Phase 5: destination-first search foundation with mock geocoding
 
 ## Why this project
 
@@ -70,6 +71,16 @@ Current Phase 2 foundation:
 - recommendation service now depends on a provider contract instead of concrete mock storage
 - typed provider configuration for future external API integration
 - provider selection config with a Google Maps integration placeholder
+
+## Phase 5 direction
+
+Phase 5 starts shifting ParkSense from coordinate-first demo input toward destination-first search that real users can understand. The first step is a geocoding abstraction with a mock destination provider so the backend can translate place names into coordinates before we wire that flow into the public API.
+
+Current Phase 5 foundation:
+
+- `DestinationGeocodingProvider` abstraction for destination lookup
+- mock geocoding provider for local development and demos
+- seeded destinations such as Seattle Convention Center, Pike Place Market, Space Needle, and Seattle Waterfront
 
 ## Persistence flow
 
