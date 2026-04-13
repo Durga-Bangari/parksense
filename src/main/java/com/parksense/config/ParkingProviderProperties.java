@@ -6,7 +6,9 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class ParkingProviderProperties {
 
     private String type = "mock";
+    private String geocodingType = "mock";
     private String googleMapsBaseUrl = "https://places.googleapis.com/v1";
+    private String googleMapsGeocodingBaseUrl = "https://maps.googleapis.com/maps/api/geocode";
     private String googleMapsApiKey = "";
     private int searchRadiusMeters = 1500;
     private boolean fallbackToMockOnFailure = true;
@@ -21,6 +23,14 @@ public class ParkingProviderProperties {
         this.type = type;
     }
 
+    public String getGeocodingType() {
+        return geocodingType;
+    }
+
+    public void setGeocodingType(String geocodingType) {
+        this.geocodingType = geocodingType;
+    }
+
     public String getGoogleMapsApiKey() {
         return googleMapsApiKey;
     }
@@ -31,6 +41,14 @@ public class ParkingProviderProperties {
 
     public void setGoogleMapsBaseUrl(String googleMapsBaseUrl) {
         this.googleMapsBaseUrl = googleMapsBaseUrl;
+    }
+
+    public String getGoogleMapsGeocodingBaseUrl() {
+        return googleMapsGeocodingBaseUrl;
+    }
+
+    public void setGoogleMapsGeocodingBaseUrl(String googleMapsGeocodingBaseUrl) {
+        this.googleMapsGeocodingBaseUrl = googleMapsGeocodingBaseUrl;
     }
 
     public void setGoogleMapsApiKey(String googleMapsApiKey) {

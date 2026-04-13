@@ -9,6 +9,16 @@ ParkSense is an AI-ready backend system for parking recommendation. In this firs
 - Phase 3: persistence support for search history and app-oriented backend workflows
 - Phase 4: React + TypeScript frontend for search, history, diagnostics, and sharing
 - Phase 5: destination-first search foundation with mock geocoding
+ 
+## Phase 6 direction
+
+Phase 6 upgrades destination lookup from mock-only behavior toward real geocoding. The first step is to make destination geocoding selectable the same way parking data providers already are, so ParkSense can keep the current mock mode for local development while preparing a Google Maps geocoding path.
+
+Current Phase 6 foundation:
+
+- configurable geocoding provider selection
+- default mock geocoding for local development
+- Google Maps geocoding provider placeholder for the real integration path
 
 ## Why this project
 
@@ -99,6 +109,7 @@ The backend is now prepared for future external provider integration through con
 
 ```properties
 parksense.provider.type=mock
+parksense.provider.geocoding-type=mock
 parksense.provider.google-maps-api-key=
 parksense.provider.search-radius-meters=1500
 ```
@@ -134,7 +145,9 @@ Current Google Maps configuration:
 
 ```properties
 parksense.provider.type=mock
+parksense.provider.geocoding-type=mock
 parksense.provider.google-maps-base-url=https://places.googleapis.com/v1
+parksense.provider.google-maps-geocoding-base-url=https://maps.googleapis.com/maps/api/geocode
 parksense.provider.google-maps-api-key=
 parksense.provider.search-radius-meters=1500
 parksense.provider.fallback-to-mock-on-failure=true
