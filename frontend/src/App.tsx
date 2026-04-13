@@ -112,8 +112,18 @@ function toDatetimeLocalValue(dateTime: string) {
   return dateTime.slice(0, 16);
 }
 
+function readFormFromUrl(): SearchForm {
+  const searchParams = new URLSearchParams(window.location.search);
+
+  return {
+    latitude: searchParams.get("latitude") ?? initialFormState.latitude,
+    longitude: searchParams.get("longitude") ?? initialFormState.longitude,
+    arrivalTime: searchParams.get("arrivalTime") ?? initialFormState.arrivalTime
+  };
+}
+
 function App() {
-  const [form, setForm] = useState<SearchForm>(initialFormState);
+  const [form, setForm] = useState<SearchForm>(readFormFromUrl);
   const [result, setResult] = useState<RecommendationResponse | null>(null);
   const [historyItems, setHistoryItems] = useState<SearchHistoryItem[]>([]);
   const [providerDiagnostics, setProviderDiagnostics] =
@@ -186,6 +196,16 @@ function App() {
     void loadRecentSearches();
     void loadDiagnostics();
   }, []);
+
+  useEffect(() => {
+    const searchParams = new URLSearchParams();
+    searchParams.set("latitude", form.latitude);
+    searchParams.set("longitude", form.longitude);
+    searchParams.set("arrivalTime", form.arrivalTime);
+
+    const nextUrl = `${window.location.pathname}?${searchParams.toString()}`;
+    window.history.replaceState(null, "", nextUrl);
+  }, [form]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();

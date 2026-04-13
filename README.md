@@ -239,6 +239,8 @@ npm run dev
 
 The frontend expects the backend API base URL in `VITE_API_BASE_URL`. For local development, you can copy `frontend/.env.example` and keep the default `http://localhost:8080/api/v1` value.
 
+The frontend also keeps the current search form in the URL query string so a recommendation scenario can be refreshed, bookmarked, or shared.
+
 ### Test the application
 
 ```bash
