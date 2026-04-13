@@ -9,6 +9,7 @@ ParkSense is an AI-ready backend system for parking recommendation. In this firs
 - Phase 3: persistence support for search history and app-oriented backend workflows
 - Phase 4: React + TypeScript frontend for search, history, diagnostics, and sharing
 - Phase 5: destination-first search foundation with mock geocoding
+- Phase 6: real Google geocoding integration with fallback behavior
  
 ## Phase 6 direction
 
@@ -20,6 +21,7 @@ Current Phase 6 foundation:
 - default mock geocoding for local development
 - typed Google Maps geocoding client and DTOs for the real integration path
 - Google Maps geocoding provider wired to resolve real destinations when selected
+- fallback from Google geocoding to mock destination lookup when external failures occur and fallback is enabled
 
 ## Why this project
 
@@ -133,6 +135,7 @@ Supported provider types today:
 ### Google Maps mode
 
 - uses the Google Places Nearby Search path to fetch parking candidates
+- uses Google geocoding to resolve destination text into coordinates when enabled
 - maps external place data into the internal `ParkingSpot` model
 - supports fallback-to-mock behavior and short-lived caching
 
@@ -164,6 +167,12 @@ The Google provider now also:
 - falls back to mock parking data when enabled and the external call fails or returns nothing usable
 - translates provider configuration and request failures into clean API error responses
 - caches successful nearby search results for a short configurable TTL
+
+The Google geocoding path now also:
+
+- resolves destination text through the Google geocoding API when `parksense.provider.geocoding-type=google-maps`
+- falls back to mock destination lookup when enabled and the geocoding call fails or returns no usable result
+- keeps configuration errors explicit so missing API keys are still visible during setup
 
 ## App-ready backend notes
 
@@ -309,7 +318,24 @@ An example production-style config is available in [application-postgresql.examp
 1. Copy the settings from `src/main/resources/application-googlemaps.example.properties`
 2. Put your real Google Maps API key into `parksense.provider.google-maps-api-key`
 3. Set `parksense.provider.type=google-maps`
-4. Start the app and check `GET /api/v1/provider`
+4. Set `parksense.provider.geocoding-type=google-maps`
+5. Start the app and check `GET /api/v1/provider`
+
+### Try real destination geocoding
+
+After enabling Google Maps mode, you can exercise the real destination flow directly:
+
+```bash
+curl -X POST http://localhost:8080/api/v1/recommendations/by-destination \
+  -H "Content-Type: application/json" \
+  -d "{\"destination\":\"Seattle Convention Center\",\"arrivalTime\":\"2026-04-12T18:00:00\"}"
+```
+
+Recommended setup notes:
+
+- keep `parksense.provider.fallback-to-mock-on-failure=true` while validating your first Google Maps setup
+- use `mock` mode for day-to-day development if you want deterministic demo behavior
+- switch both provider types to `google-maps` when you want the full real-data path
 
 ### First endpoint
 
@@ -344,6 +370,8 @@ Example response:
   "searchRadiusMeters": 1500
 }
 ```
+
+This endpoint currently reports parking data provider readiness. Destination geocoding uses the same shared Google Maps API key and fallback settings.
 
 ### Recent search history endpoint
 
@@ -415,7 +443,7 @@ Example request:
 }
 ```
 
-This endpoint currently uses the mock geocoding provider introduced in Phase 5 and then reuses the same recommendation engine behind the coordinate-based flow.
+This endpoint now routes through the selected destination geocoding provider and then reuses the same recommendation engine behind the coordinate-based flow.
 
 For the current frontend and real-user demo flow, this is the primary endpoint.
 
@@ -454,6 +482,11 @@ When the Google Maps provider is active:
 - missing provider configuration returns `503 Service Unavailable`
 - upstream provider request failures return `502 Bad Gateway`
 - optional fallback can still serve mock recommendations when enabled
+
+For destination-based requests, fallback applies to both:
+
+- parking candidate lookup
+- destination geocoding
 
 ## Recruiter-friendly positioning
 

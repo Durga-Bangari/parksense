@@ -13,17 +13,23 @@ import static org.mockito.Mockito.mock;
 class GeocodingProviderConfigTest {
 
     private final GeocodingProviderConfig geocodingProviderConfig = new GeocodingProviderConfig();
+    private final ParkingProviderProperties properties = new ParkingProviderProperties();
+    private final MockDestinationGeocodingProvider mockDestinationGeocodingProvider =
+            new MockDestinationGeocodingProvider();
 
     @Test
     void returnsMockProviderWhenConfiguredTypeIsMock() {
-        ParkingProviderProperties properties = new ParkingProviderProperties();
         properties.setGeocodingType("mock");
 
         DestinationGeocodingProvider provider =
                 geocodingProviderConfig.destinationGeocodingProvider(
                         properties,
-                        new MockDestinationGeocodingProvider(),
-                        new GoogleMapsDestinationGeocodingProvider(mock(GoogleMapsGeocodingClient.class))
+                        mockDestinationGeocodingProvider,
+                        new GoogleMapsDestinationGeocodingProvider(
+                                mock(GoogleMapsGeocodingClient.class),
+                                mockDestinationGeocodingProvider,
+                                properties
+                        )
                 );
 
         assertInstanceOf(MockDestinationGeocodingProvider.class, provider);
@@ -31,14 +37,17 @@ class GeocodingProviderConfigTest {
 
     @Test
     void returnsGoogleMapsProviderWhenConfiguredTypeIsGoogleMaps() {
-        ParkingProviderProperties properties = new ParkingProviderProperties();
         properties.setGeocodingType("google-maps");
 
         DestinationGeocodingProvider provider =
                 geocodingProviderConfig.destinationGeocodingProvider(
                         properties,
-                        new MockDestinationGeocodingProvider(),
-                        new GoogleMapsDestinationGeocodingProvider(mock(GoogleMapsGeocodingClient.class))
+                        mockDestinationGeocodingProvider,
+                        new GoogleMapsDestinationGeocodingProvider(
+                                mock(GoogleMapsGeocodingClient.class),
+                                mockDestinationGeocodingProvider,
+                                properties
+                        )
                 );
 
         assertInstanceOf(GoogleMapsDestinationGeocodingProvider.class, provider);
@@ -46,15 +55,18 @@ class GeocodingProviderConfigTest {
 
     @Test
     void throwsForUnsupportedProviderType() {
-        ParkingProviderProperties properties = new ParkingProviderProperties();
         properties.setGeocodingType("unknown");
 
         assertThrows(
                 IllegalArgumentException.class,
                 () -> geocodingProviderConfig.destinationGeocodingProvider(
                         properties,
-                        new MockDestinationGeocodingProvider(),
-                        new GoogleMapsDestinationGeocodingProvider(mock(GoogleMapsGeocodingClient.class))
+                        mockDestinationGeocodingProvider,
+                        new GoogleMapsDestinationGeocodingProvider(
+                                mock(GoogleMapsGeocodingClient.class),
+                                mockDestinationGeocodingProvider,
+                                properties
+                        )
                 )
         );
     }
