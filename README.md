@@ -229,6 +229,16 @@ mvn spring-boot:run
 
 The application starts on `http://localhost:8080`.
 
+### Run the frontend
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+The frontend expects the backend API base URL in `VITE_API_BASE_URL`. For local development, you can copy `frontend/.env.example` and keep the default `http://localhost:8080/api/v1` value.
+
 ### Test the application
 
 ```bash

@@ -49,7 +49,11 @@ type SearchForm = {
   arrivalTime: string;
 };
 
-const API_BASE_URL = "http://localhost:8080/api/v1";
+const configuredApiBaseUrl = import.meta.env.VITE_API_BASE_URL?.trim();
+
+const API_BASE_URL = configuredApiBaseUrl
+  ? configuredApiBaseUrl.replace(/\/$/, "")
+  : "http://localhost:8080/api/v1";
 
 const highlights: string[] = [
   "Heuristic parking recommendation engine",
