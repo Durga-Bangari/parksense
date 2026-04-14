@@ -13,12 +13,12 @@ ParkSense is an AI-ready backend system for parking recommendation. In this firs
  
 ## Phase 6 direction
 
-Phase 6 upgrades destination lookup from mock-only behavior toward real geocoding. The first step is to make destination geocoding selectable the same way parking data providers already are, so ParkSense can keep the current mock mode for local development while preparing a Google Maps geocoding path.
+Phase 6 upgrades destination lookup from mock-only behavior toward real geocoding and now supports a strict Google-mode runtime for real app usage.
 
 Current Phase 6 foundation:
 
 - configurable geocoding provider selection
-- default mock geocoding for local development
+- strict Google-mode runtime defaults for real-data usage
 - typed Google Maps geocoding client and DTOs for the real integration path
 - Google Maps geocoding provider wired to resolve real destinations when selected
 - fallback from Google geocoding to mock destination lookup when external failures occur and fallback is enabled
@@ -111,13 +111,13 @@ This keeps the first persistence slice simple while still adding meaningful app 
 The backend is now prepared for future external provider integration through configuration:
 
 ```properties
-parksense.provider.type=mock
-parksense.provider.geocoding-type=mock
+parksense.provider.type=google-maps
+parksense.provider.geocoding-type=google-maps
 parksense.provider.google-maps-api-key=
 parksense.provider.search-radius-meters=1500
 ```
 
-For local development, the active provider should stay `mock`. When you want to test the real provider path, switch the type to `google-maps` and supply a valid API key.
+The default runtime now targets real Google provider paths. Supply a valid API key before starting the app.
 
 Supported provider types today:
 
@@ -148,13 +148,13 @@ The backend now includes a typed Google Maps Places client and DTOs for the Near
 Current Google Maps configuration:
 
 ```properties
-parksense.provider.type=mock
-parksense.provider.geocoding-type=mock
+parksense.provider.type=google-maps
+parksense.provider.geocoding-type=google-maps
 parksense.provider.google-maps-base-url=https://places.googleapis.com/v1
 parksense.provider.google-maps-geocoding-base-url=https://maps.googleapis.com/maps/api/geocode
 parksense.provider.google-maps-api-key=
 parksense.provider.search-radius-meters=1500
-parksense.provider.fallback-to-mock-on-failure=true
+parksense.provider.fallback-to-mock-on-failure=false
 parksense.provider.cache-enabled=true
 parksense.provider.cache-ttl-seconds=300
 ```
@@ -164,14 +164,14 @@ When `parksense.provider.type=google-maps`, the backend is prepared to call the 
 The Google provider now also:
 
 - filters incomplete external place records before mapping
-- falls back to mock parking data when enabled and the external call fails or returns nothing usable
+- can fall back to mock parking data only when explicitly enabled
 - translates provider configuration and request failures into clean API error responses
 - caches successful nearby search results for a short configurable TTL
 
 The Google geocoding path now also:
 
 - resolves destination text through the Google geocoding API when `parksense.provider.geocoding-type=google-maps`
-- falls back to mock destination lookup when enabled and the geocoding call fails or returns no usable result
+- can fall back to mock destination lookup only when explicitly enabled
 - keeps configuration errors explicit so missing API keys are still visible during setup
 
 ## App-ready backend notes
@@ -333,9 +333,8 @@ curl -X POST http://localhost:8080/api/v1/recommendations/by-destination \
 
 Recommended setup notes:
 
-- keep `parksense.provider.fallback-to-mock-on-failure=true` while validating your first Google Maps setup
-- use `mock` mode for day-to-day development if you want deterministic demo behavior
-- switch both provider types to `google-maps` when you want the full real-data path
+- keep `parksense.provider.fallback-to-mock-on-failure=false` for strict real-data mode
+- if you need temporary resilience during setup, enable fallback explicitly and switch it off before production
 
 ### First endpoint
 
@@ -481,7 +480,7 @@ When the Google Maps provider is active:
 
 - missing provider configuration returns `503 Service Unavailable`
 - upstream provider request failures return `502 Bad Gateway`
-- optional fallback can still serve mock recommendations when enabled
+- optional fallback can still serve mock recommendations when explicitly enabled
 
 For destination-based requests, fallback applies to both:
 
